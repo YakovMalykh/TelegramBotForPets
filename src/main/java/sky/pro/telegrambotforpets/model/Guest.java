@@ -1,5 +1,6 @@
 package sky.pro.telegrambotforpets.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -15,13 +16,15 @@ public class Guest {
     @Id
     private Long chatId;
     private String userName;
+    private String phoneNumber;
 
     public Guest() {
     }
 
-    public Guest(Long chatId, String userName) {
+    public Guest(Long chatId, String userName, String phoneNumber) {
         this.chatId = chatId;
         this.userName = userName;
+        this.phoneNumber = phoneNumber;
     }
 
     public Long getChatId() {
@@ -38,6 +41,14 @@ public class Guest {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     @Override
@@ -58,6 +69,7 @@ public class Guest {
         return "Guest{" +
                 "chatId=" + chatId +
                 ", userName='" + userName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
     }
 }
