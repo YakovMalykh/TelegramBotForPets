@@ -1,4 +1,3 @@
 databaseChangeLog:
   - include:
-     file: liquibase/scripts/guests.sql
-
+      file: liquibase/scripts/guests.sql
