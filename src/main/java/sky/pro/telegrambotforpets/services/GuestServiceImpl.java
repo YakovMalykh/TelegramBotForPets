@@ -11,6 +11,7 @@ import sky.pro.telegrambotforpets.model.Guest;
 import sky.pro.telegrambotforpets.repositories.GuestRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -62,17 +63,9 @@ public class GuestServiceImpl implements GuestService {
      * @see JpaRepository#findAll()
      */
     public boolean doesGuestAlreadyExistsInDB(Update update) {
-        /**
-         * т.к. equals проверяте только id, присваиваем полученный из сообщения ID новому гостю
-         * и проверяем не содержится ли такой гость в БД
-         */
         Long chatId = update.message().chat().id();
-        Guest guest = new Guest();
-        guest.setChatId(chatId);
-
         logger.info("выполнился метод doesGuestAlreadyExistsInDB");
-        return  guestRepository.findAll().contains(guest);
-
+        return guestRepository.findById(chatId).isPresent();
     }
 
 
