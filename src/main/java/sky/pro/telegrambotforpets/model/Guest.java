@@ -14,17 +14,12 @@ import java.util.Objects;
 @Table(name = "guests")
 public class Guest {
     @Id
+
     private Long chatId;
     private String userName;
     private String phoneNumber;
 
     public Guest() {
-    }
-
-    public Guest(Long chatId, String userName, String phoneNumber) {
-        this.chatId = chatId;
-        this.userName = userName;
-        this.phoneNumber = phoneNumber;
     }
 
     public Long getChatId() {
