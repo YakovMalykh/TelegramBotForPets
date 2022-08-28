@@ -24,12 +24,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     @Autowired
     private TelegramBot telegramBot;
 
-    private final GuestServiceImpl guestService;
-    private final GuestRepository guestRepository;
+    private final GuestService guestService;
 
-    public TelegramBotUpdatesListener(GuestServiceImpl guestService, GuestRepository guestRepository) {
+    public TelegramBotUpdatesListener(GuestServiceImpl guestService) {
         this.guestService = guestService;
-        this.guestRepository = guestRepository;
     }
 
     @PostConstruct
@@ -48,13 +46,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             /**
              * занесение данных Гостя в базу при первом обращении
              */
-            Long chatId = update.message().chat().id();
-            String userName = guestService.getUserNameOfGuest(update);
-            Guest guest = new Guest();
-            guest.setChatId(chatId);
-            guest.setUserName(userName);
-            guestRepository.save(guest);
+            guestService.saveGuestToDB(update);
 
+            Long chatId = update.message().chat().id();
             SendMessage message = new SendMessage(chatId, "Привет!");
             SendResponse responce = telegramBot.execute(message);
             System.out.println(responce.isOk());

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sky.pro.telegrambotforpets.interfaces.GuestService;
+import sky.pro.telegrambotforpets.model.Guest;
 import sky.pro.telegrambotforpets.repositories.GuestRepository;
 
 @Service
@@ -18,14 +19,32 @@ public class GuestServiceImpl implements GuestService {
         this.guestRepository = guestRepository;
     }
 
+    /**
+     * получение имени пользователя при первом обращении без запроса контакта
+     * @param update
+     * @return userName или Гость
+     */
     public String getUserNameOfGuest(Update update) {
         String userName = update.message().from().username();
-        if  (userName!=null && !( userName.isEmpty() && userName.isBlank() )) {
-            logger.info("выполнился метод getUserNameOfGuest, получили userName");
+        if (userName != null && !(userName.isEmpty() && userName.isBlank())) {
             return userName;
         }
-        logger.info("выполнился метод getUserNameOfGuest, не получили userName");
         return "Гость";
+    }
+
+    /**
+     * сохранение записи в таблицу guests, заносятся поля userName и chatId
+     * используется метод репозитория {@link org.springframework.data.jpa.repository.JpaRepository#save(Object)}
+     * @param update
+     */
+    public void saveGuestToDB(Update update) {
+        Long chatId = update.message().chat().id();
+        String userName = getUserNameOfGuest(update);
+        Guest guest = new Guest();
+        guest.setChatId(chatId);
+        guest.setUserName(userName);
+        guestRepository.save(guest);
+        logger.info("выполнился метод saveGuestToDB, в БД занесен Гость с именем " + userName + " и chatId " + chatId);
     }
 
 
