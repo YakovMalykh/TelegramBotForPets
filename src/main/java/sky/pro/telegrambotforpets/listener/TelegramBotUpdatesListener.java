@@ -41,13 +41,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         updates.forEach(update -> {
             /**
              * здесь пока просто отвечает "Привет!" на любое сообщение
-             *
-             */
-            /**
              * занесение данных Гостя в базу при первом обращении
              */
-            guestService.saveGuestToDB(update);
+            if (!guestService.doesGuestAlreadyExistsInDB(update)) {
+                guestService.saveGuestToDB(update);
+            }
 
+            /**
+             * этот код мы позже переработаем
+             */
             Long chatId = update.message().chat().id();
             SendMessage message = new SendMessage(chatId, "Привет!");
             SendResponse responce = telegramBot.execute(message);
