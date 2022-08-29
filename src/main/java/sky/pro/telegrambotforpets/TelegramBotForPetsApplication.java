@@ -1,13 +1,17 @@
 package sky.pro.telegrambotforpets;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
+@OpenAPIDefinition
 public class TelegramBotForPetsApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TelegramBotForPetsApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TelegramBotForPetsApplication.class, args);
+    }
 
 }
