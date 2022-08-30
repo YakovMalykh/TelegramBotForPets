@@ -1,3 +1,10 @@
 databaseChangeLog:
   - include:
       file: liquibase/scripts/guests.sql
+  - include:
+      file: liquibase/scripts/shelter.sql
+  - include:
+      file: liquibase/scripts/preparation.sql
+  - include:
+      file: liquibase/scripts/doghandler.sql
+

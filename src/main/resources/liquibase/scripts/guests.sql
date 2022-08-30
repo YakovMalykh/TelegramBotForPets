@@ -8,4 +8,3 @@ CREATE TABLE IF NOT EXISTS guests
     user_name VARCHAR (100),
     phone_number VARCHAR(20)
 );
-
