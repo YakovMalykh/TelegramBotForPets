@@ -17,7 +17,9 @@ public class DogHandler extends Person {
     private Long id;
 
     private Long idChat;
-
+    /**
+     * объявляю здесь все поля родительского класса, иначе они не создаются в таблице
+     */
     private String name;
 
     private String middleName;
@@ -60,75 +62,6 @@ public class DogHandler extends Person {
         this.description = description;
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    @Override
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    @Override
-    public String getLastName() {
-        return lastName;
-    }
-
-    @Override
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    @Override
-    public String getGender() {
-        return gender;
-    }
-
-    @Override
-    public void setGender(String gender) {
-        super.setGender(gender);
-    }
-
-    @Override
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    @Override
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
-    @Override
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    @Override
-    public void setPhoneNumber(String phoneNumber) {
-        super.setPhoneNumber(phoneNumber);
-    }
-
-    @Override
-    public String getAddress() {
-        return address;
-    }
-
-    @Override
-    public void setAddress(String address) {
-        this.address = address;
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -102,7 +102,7 @@ public abstract class Person {
      * @throws IllegalArgumentException
      */
     public void setPhoneNumber(String phoneNumber) {
-        if (phoneNumber != null && !(phoneNumber.isBlank() && phoneNumber.isBlank())) {
+        if (phoneNumber != null && !(phoneNumber.isBlank() && phoneNumber.isEmpty())) {
 
             this.phoneNumber = phoneNumber
                     .replace("+7", "8")
