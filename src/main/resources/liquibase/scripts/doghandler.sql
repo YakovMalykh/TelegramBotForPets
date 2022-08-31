@@ -16,3 +16,6 @@ CREATE TABLE IF NOT EXISTS doghandler
     doghandler_description VARCHAR (255)
 );
 
+-- changeset ymalykh:2
+DROP TABLE IF EXISTS doghandler;
+

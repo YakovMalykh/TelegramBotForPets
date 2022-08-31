@@ -10,48 +10,125 @@ import java.util.Objects;
  * Отображается на таблицу <b>doghandler</b>
  */
 @Entity
-@Table(name = "doghandler")
-public class DogHandler extends Person{
+//@Table(name = "doghandler")
+public class DogHandler extends Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "doghandler_chatid")
     private Long idChat;
-    // doghandler_chatid BIGINT;
 
-    @Column(name = "doghandler_name")
     private String name;
-    //doghandler_name VARCHAR (20),
 
-    @Column(name = "doghandler_middlename")
     private String middleName;
-//    doghandler_middlename VARCHAR (20),
 
-    @Column(name = "doghandler_lastname")
     private String lastName;
-//    doghandler_lastname VARCHAR (20),
 
-    @Column(name = "doghandler_gender")
     private String gender;
-//    doghandler_gender VARCHAR (1),
 
-    @Column(name = "doghandler_datebirth")
     private Date birthday;
-//    doghandler_datebirth DATE,
 
-    @Column(name = "doghandler_telephone")
     private String phoneNumber;
-//    doghandler_telephone VARCHAR (20),
 
-    @Column(name = "doghandler_adress")
     private String address;
-//    doghandler_adress VARCHAR (255),
-
-    @Column(name = "doghandler_description")
     private String description;
-//    doghandler_description VARCHAR (255)
 
+    public DogHandler() {
+    }
+
+    public DogHandler(String name, String middleName, String lastName, String gender,
+                      Date birthday, String phoneNumber, String address, Long idChat,
+                      String description) {
+        super(name, middleName, lastName, gender, birthday, phoneNumber, address);
+        this.idChat = idChat;
+        this.description = description;
+    }
+
+    public Long getIdChat() {
+        return idChat;
+    }
+
+    public void setIdChat(Long idChat) {
+        this.idChat = idChat;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    @Override
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
+    @Override
+    public String getLastName() {
+        return lastName;
+    }
+
+    @Override
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    @Override
+    public String getGender() {
+        return gender;
+    }
+
+    @Override
+    public void setGender(String gender) {
+        super.setGender(gender);
+    }
+
+    @Override
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    @Override
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    @Override
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    @Override
+    public void setPhoneNumber(String phoneNumber) {
+        super.setPhoneNumber(phoneNumber);
+    }
+
+    @Override
+    public String getAddress() {
+        return address;
+    }
+
+    @Override
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -64,6 +141,15 @@ public class DogHandler extends Person{
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "DogHandler{" +
+                "id=" + id +
+                ", idChat=" + idChat +
+                ", description='" + description + '\'' +
+                '}' + super.toString();
     }
 
 }

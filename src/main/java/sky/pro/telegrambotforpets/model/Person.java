@@ -3,6 +3,7 @@ package sky.pro.telegrambotforpets.model;
 import java.util.Date;
 import java.util.Objects;
 
+
 /**
  * вводим абстаркатный класс, чтобы впоследствии от него можно было наследовать Усыновителя,
  * Кинолога и, возможно, Волонтера
@@ -16,6 +17,19 @@ public abstract class Person {
     private String phoneNumber;
     private String address;
 
+    public Person() {
+    }
+
+    public Person(String name, String middleName, String lastName, String gender,
+                  Date birthday, String phoneNumber, String address) {
+        this.name = name;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.birthday = birthday;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
 
     public String getName() {
         return name;
@@ -52,6 +66,13 @@ public abstract class Person {
     private enum Gender {
         M, F
     }
+
+    /**
+     * проверяю, что только один символ и он может быть
+     * только M или F
+     * @param gender
+     * @throws IllegalArgumentException
+     */
     public void setGender(String gender) {
         if (gender.length() == 1 && (
                 gender.toUpperCase().equals(Gender.M.name()) || gender.toUpperCase().equals(Gender.F.name())
@@ -74,8 +95,24 @@ public abstract class Person {
         return phoneNumber;
     }
 
+    /**
+     * сохраняем в БД номер телефона вида 89990001122
+     *
+     * @param phoneNumber
+     * @throws IllegalArgumentException
+     */
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        if (phoneNumber != null && !(phoneNumber.isBlank() && phoneNumber.isBlank())) {
+
+            this.phoneNumber = phoneNumber
+                    .replace("+7", "8")
+                    .replace(" ", "")
+                    .replace("-", "")
+                    .replace("(", "")
+                    .replace(")", "");
+        } else {
+            throw new IllegalArgumentException("введены некорректные данные");
+        }
     }
 
     public String getAddress() {
@@ -91,7 +128,7 @@ public abstract class Person {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return name.equals(person.name) && middleName.equals(person.middleName) && lastName.equals(person.lastName) && gender.equals(person.gender) && birthday.equals(person.birthday) && phoneNumber.equals(person.phoneNumber);
+        return Objects.equals(name, person.name) && Objects.equals(middleName, person.middleName) && Objects.equals(lastName, person.lastName) && Objects.equals(gender, person.gender) && Objects.equals(birthday, person.birthday) && Objects.equals(phoneNumber, person.phoneNumber);
     }
 
     @Override
@@ -99,4 +136,14 @@ public abstract class Person {
         return Objects.hash(name, middleName, lastName, gender, birthday, phoneNumber);
     }
 
+    @Override
+    public String toString() {
+        return " " + "name='" + name + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", gender='" + gender + '\'' +
+                ", birthday=" + birthday +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + address;
+    }
 }
