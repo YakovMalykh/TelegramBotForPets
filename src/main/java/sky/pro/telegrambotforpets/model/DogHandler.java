@@ -2,6 +2,7 @@ package sky.pro.telegrambotforpets.model;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -9,53 +10,40 @@ import java.util.Objects;
  * Отображается на таблицу <b>doghandler</b>
  */
 @Entity
-@Table(name = "doghandler")
-public class DogHandler {
+//@Table(name = "doghandler")
+public class DogHandler extends Person {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "doghandler_chatid")
     private Long idChat;
-    // doghandler_chatid BIGINT;
-
-    @Column(name = "doghandler_name")
+    /**
+     * объявляю здесь все поля родительского класса, иначе они не создаются в таблице
+     */
     private String name;
-    //doghandler_name VARCHAR (20),
 
-    @Column(name = "doghandler_middlename")
     private String middleName;
-//    doghandler_middlename VARCHAR (20),
 
-    @Column(name = "doghandler_lastname")
     private String lastName;
-//    doghandler_lastname VARCHAR (20),
 
-    @Column(name = "doghandler_gender")
-    private Character gender;
-//    doghandler_gender VARCHAR (1),
+    private String gender;
 
-    @Column(name = "doghandler_datebirth")
-    private LocalDate birthDate;
-//    doghandler_datebirth DATE,
+    private Date birthday;
 
-    @Column(name = "doghandler_telephone")
     private String phoneNumber;
-//    doghandler_telephone VARCHAR (20),
 
-    @Column(name = "doghandler_adress")
-    private String adress;
-//    doghandler_adress VARCHAR (255),
-
-    @Column(name = "doghandler_description")
+    private String address;
     private String description;
-//    doghandler_description VARCHAR (255)
 
     public DogHandler() {
     }
 
-    public Long getId() {
-        return id;
+    public DogHandler(String name, String middleName, String lastName, String gender,
+                      Date birthday, String phoneNumber, String address, Long idChat,
+                      String description) {
+        super(name, middleName, lastName, gender, birthday, phoneNumber, address);
+        this.idChat = idChat;
+        this.description = description;
     }
 
     public Long getIdChat() {
@@ -66,62 +54,6 @@ public class DogHandler {
         this.idChat = idChat;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Character getGender() {
-        return gender;
-    }
-
-    public void setGender(Character gender) {
-        this.gender = gender;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public String getPhone() {
-        return phoneNumber;
-    }
-
-    public void setPhone(String phone) {
-        this.phoneNumber = phone;
-    }
-
-    public String getAdress() {
-        return adress;
-    }
-
-    public void setAdress(String adress) {
-        this.adress = adress;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -129,6 +61,7 @@ public class DogHandler {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -148,14 +81,8 @@ public class DogHandler {
         return "DogHandler{" +
                 "id=" + id +
                 ", idChat=" + idChat +
-                ", name='" + name + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender=" + gender +
-                ", birthDate=" + birthDate +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", adress='" + adress + '\'' +
                 ", description='" + description + '\'' +
-                '}';
+                '}' + super.toString();
     }
+
 }
