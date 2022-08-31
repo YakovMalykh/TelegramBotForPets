@@ -15,3 +15,4 @@ CREATE TABLE IF NOT EXISTS doghandler
     doghandler_adress VARCHAR (255),
     doghandler_description VARCHAR (255)
 );
+

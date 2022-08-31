@@ -52,7 +52,6 @@ public abstract class Person {
     private enum Gender {
         M, F
     }
-
     public void setGender(String gender) {
         if (gender.length() == 1 && (
                 gender.toUpperCase().equals(Gender.M.name()) || gender.toUpperCase().equals(Gender.F.name())

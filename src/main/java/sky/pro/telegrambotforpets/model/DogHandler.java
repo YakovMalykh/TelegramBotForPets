@@ -2,6 +2,7 @@ package sky.pro.telegrambotforpets.model;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "doghandler")
-public class DogHandler {
+public class DogHandler extends Person{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,11 +33,11 @@ public class DogHandler {
 //    doghandler_lastname VARCHAR (20),
 
     @Column(name = "doghandler_gender")
-    private Character gender;
+    private String gender;
 //    doghandler_gender VARCHAR (1),
 
     @Column(name = "doghandler_datebirth")
-    private LocalDate birthDate;
+    private Date birthday;
 //    doghandler_datebirth DATE,
 
     @Column(name = "doghandler_telephone")
@@ -44,91 +45,13 @@ public class DogHandler {
 //    doghandler_telephone VARCHAR (20),
 
     @Column(name = "doghandler_adress")
-    private String adress;
+    private String address;
 //    doghandler_adress VARCHAR (255),
 
     @Column(name = "doghandler_description")
     private String description;
 //    doghandler_description VARCHAR (255)
 
-    public DogHandler() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public Long getIdChat() {
-        return idChat;
-    }
-
-    public void setIdChat(Long idChat) {
-        this.idChat = idChat;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getMiddleName() {
-        return middleName;
-    }
-
-    public void setMiddleName(String middleName) {
-        this.middleName = middleName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public Character getGender() {
-        return gender;
-    }
-
-    public void setGender(Character gender) {
-        this.gender = gender;
-    }
-
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    public String getPhone() {
-        return phoneNumber;
-    }
-
-    public void setPhone(String phone) {
-        this.phoneNumber = phone;
-    }
-
-    public String getAdress() {
-        return adress;
-    }
-
-    public void setAdress(String adress) {
-        this.adress = adress;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -143,19 +66,4 @@ public class DogHandler {
         return Objects.hash(id);
     }
 
-    @Override
-    public String toString() {
-        return "DogHandler{" +
-                "id=" + id +
-                ", idChat=" + idChat +
-                ", name='" + name + '\'' +
-                ", middleName='" + middleName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender=" + gender +
-                ", birthDate=" + birthDate +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", adress='" + adress + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-    }
 }
