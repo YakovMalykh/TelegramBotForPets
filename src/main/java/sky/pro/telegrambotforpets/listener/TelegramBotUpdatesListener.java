@@ -51,7 +51,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 case MENU_1_BUTTON_1:
                     //Здесь будет ответ на запрос О приюте
                     sendMsg(update, "Информация о приюте");
-                    sendMenu(update.message().chat().id());
                     break;
                 case MENU_1_BUTTON_2:
                     //Здесь будет ответ на запрос Как взять питомца
