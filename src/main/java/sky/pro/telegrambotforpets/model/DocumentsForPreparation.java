@@ -17,6 +17,7 @@ public class DocumentsForPreparation {
     /**
      * убрал Gene {@GeneratedValue}, т.к. в БД использую автоинкрементирующийся тип данных
      */
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "documents_for_preparation_description")
