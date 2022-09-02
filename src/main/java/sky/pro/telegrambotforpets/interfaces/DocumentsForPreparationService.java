@@ -47,7 +47,7 @@ public interface DocumentsForPreparationService {
      * @return
      * @throws HttpClientErrorException.BadRequest,HttpClientErrorException.NotFound
      */
-    ResponseEntity<Void> removeDocument(Integer documentId);
+    ResponseEntity<Void> removeDocument(Integer documentId) throws IOException;
 
 
 

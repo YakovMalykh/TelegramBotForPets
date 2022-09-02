@@ -32,6 +32,7 @@ public class DocumentsForPreparationController {
         try {
             docForPrepService.saveDocumentToDB(description, file);
         } catch (IOException ioException) {
+            ioException.printStackTrace();
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().build();
@@ -44,15 +45,22 @@ public class DocumentsForPreparationController {
         try {
             docForPrepService.editDocuments(description, file);
         } catch (IOException ioException) {
+            ioException.printStackTrace();
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}")
-    public void getDocument(@PathVariable Long docId,
+    /**
+     * метод вычитывает файл из его папки
+     * @param documentId
+     * @param response
+     * @throws IOException
+     * @see sky.pro.telegrambotforpets.services.DocumentsForPreparationServiceImpl#getDocument(Integer)
+     */
+    @GetMapping(value = "/{documentId}")
+    public void getDocument(@PathVariable Integer documentId,
                             HttpServletResponse response) throws IOException {
-        Integer documentId = docId.intValue();
 
         DocumentsForPreparation document = docForPrepService.getDocument(documentId).getBody();
         if (document != null) {
@@ -63,14 +71,22 @@ public class DocumentsForPreparationController {
                     OutputStream os = response.getOutputStream();
             ) {
                 response.setStatus(200);
-                response.setContentType(null);
-                response.setContentLength();
+                response.setContentType(document.getMediaType());
+                response.setContentLength(document.getFileSize().intValue());
                 is.transferTo(os);
             }
         }
 
     }
 
+    /**
+     * возвращает список документов в формате json. Если вызвать без параметра, то выдаст список всех
+     * документов, содержащихся в базе. При передаче параметра (часть строки) поиск идет по частичному
+     * совпадению в поле description
+     *
+     * @param partDescription
+     * @return List of DocumentsForPreparation
+     */
     @GetMapping
     public ResponseEntity<Collection<DocumentsForPreparation>> getListOfDocuments(
             @RequestParam(required = false) String partDescription) {
@@ -81,9 +97,9 @@ public class DocumentsForPreparationController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeDocument(@PathVariable Integer documentId) {
-        return docForPrepService.removeDocument(documentId);
+    @DeleteMapping(value = "/{documentId}")
+    public ResponseEntity<Void> removeDocument(@PathVariable Integer documentId) throws IOException{
+          return docForPrepService.removeDocument(documentId);
     }
 
 

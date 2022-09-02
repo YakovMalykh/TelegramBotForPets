@@ -65,6 +65,8 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
             DocumentsForPreparation document = new DocumentsForPreparation();
             document.setDescription(description);
             document.setFilePath(filePath.toString());
+            document.setFileSize(file.getSize());
+            document.setMediaType(file.getContentType());
 
             documentsForPreparationRepository.save(document);
             return ResponseEntity.ok().build();
@@ -126,9 +128,11 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
                     bis.transferTo(bos);
                 }
                 /**
-                 * вставляю новый путь в документ
+                 * вставляю новый путь, новый размер и новый контенттайп в документ
                  */
                 document.setFilePath(newFilePath.toString());
+                document.setFileSize(file.getSize());
+                document.setMediaType(file.getContentType());
                 /**
                  * сохраняю обновленный вокументы в БД
                  */
@@ -186,12 +190,17 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
      * @throws HttpClientErrorException.BadRequest,HttpClientErrorException.NotFound
      */
     @Override
-    public ResponseEntity<Void> removeDocument(Integer documentId) {
+    public ResponseEntity<Void> removeDocument(Integer documentId) throws IOException{
         if (documentId == 0) {
             return ResponseEntity.badRequest().build();
         } else if (!documentsForPreparationRepository.existsById(documentId)) {
             return ResponseEntity.notFound().build();
         } else {
+
+            DocumentsForPreparation document = documentsForPreparationRepository.findById(documentId).get();
+            Path filePath = Path.of(document.getFilePath());
+            Files.deleteIfExists(filePath);
+
             documentsForPreparationRepository.deleteById(documentId);
             return ResponseEntity.ok().build();
         }
