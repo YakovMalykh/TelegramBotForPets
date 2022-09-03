@@ -46,8 +46,11 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
      * @throws IOException
      */
     @Override
-    public ResponseEntity<Void> saveDocumentToDB(String description, MultipartFile file) throws IOException {
-        if (description != null && file != null) {
+    public boolean saveDocumentToDB(String description, MultipartFile file) throws IOException {
+        DocumentsForPreparation docExists =
+                documentsForPreparationRepository.findFirstByDescriptionIgnoreCase(description);
+
+        if (docExists == null) {
 
             Path filePath = Path.of(documentsPrepFolder, description + "." + getExtention(file));
 
@@ -70,11 +73,10 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
 
             documentsForPreparationRepository.save(document);
             logger.info("вызван метода saveDocumentToDB, файл сохранен в БД");
-            return ResponseEntity.ok().build();
-        } else {
-            logger.info("при вызове метода saveDocumentToDB, были переданы некорректные параметры");
-            return ResponseEntity.badRequest().build();
+            return true;
         }
+        logger.info("вызван метода saveDocumentToDB, файл с таким описанием уже есть в БД");
+        return false;
     }
 
     /**
@@ -106,7 +108,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
         } else {
             DocumentsForPreparation document =
                     documentsForPreparationRepository.findFirstByDescriptionIgnoreCase(description);
-            if (document!=null) {
+            if (document != null) {
 
                 /**
                  * получаю путь к файлу из этогот документа и удаляю его за ненадобностью
@@ -122,12 +124,12 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
                 /**
                  * кладу нолвый файл по новому пути
                  */
-                try(
+                try (
                         InputStream is = file.getInputStream();
                         OutputStream os = Files.newOutputStream(newFilePath, CREATE_NEW);
-                        BufferedInputStream bis = new BufferedInputStream(is,1024);
-                        BufferedOutputStream bos = new BufferedOutputStream(os,1024)
-                        ){
+                        BufferedInputStream bis = new BufferedInputStream(is, 1024);
+                        BufferedOutputStream bos = new BufferedOutputStream(os, 1024)
+                ) {
                     bis.transferTo(bos);
                 }
                 /**
@@ -202,7 +204,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
      * @throws IOException
      */
     @Override
-    public ResponseEntity<Void> removeDocument(Integer documentId) throws IOException{
+    public ResponseEntity<Void> removeDocument(Integer documentId) throws IOException {
         if (documentId == 0) {
             logger.info("метод removeDocument - передан некоррекнтый параметр");
             return ResponseEntity.badRequest().build();

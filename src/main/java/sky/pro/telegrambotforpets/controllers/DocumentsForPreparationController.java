@@ -48,7 +48,8 @@ public class DocumentsForPreparationController {
                     @ApiResponse(
                             responseCode = "400",
                             description = "если передано недопустимое описание документа, т.е. " +
-                                    "такого элемента нет в enum Descriptions"
+                                    "такого элемента нет в enum Descriptions или документ с таким" +
+                                    "описанием уже существует"
                     )
             },
             tags = "Сохранение и редактирование документов"
@@ -63,12 +64,15 @@ public class DocumentsForPreparationController {
             @RequestParam(name = "здесь используется enum Descriptions") Descriptions description,
             @RequestParam(name = "загружаем файл") MultipartFile file) {
         try {
-            docForPrepService.saveDocumentToDB(description.name(), file);
+            boolean doesDocSave = docForPrepService.saveDocumentToDB(description.name(), file);
+            if(doesDocSave){
+                return ResponseEntity.ok().build();
+            }
         } catch (IOException ioException) {
             ioException.printStackTrace();
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.badRequest().build();
     }
 
 

@@ -18,7 +18,7 @@ public interface DocumentsForPreparationService {
      * @return
      * @throws IOException
      */
-    ResponseEntity<Void> saveDocumentToDB(String description, MultipartFile file)throws IOException;
+    boolean saveDocumentToDB(String description, MultipartFile file)throws IOException;
     /**
      * equals проверяет только поле Id, поэтому при пересмотре логики equals
      * пересмотреть логику проверки в этом методе
