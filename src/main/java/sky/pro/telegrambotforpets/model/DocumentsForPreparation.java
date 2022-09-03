@@ -17,6 +17,7 @@ public class DocumentsForPreparation {
     /**
      * убрал Gene {@GeneratedValue}, т.к. в БД использую автоинкрементирующийся тип данных
      */
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "documents_for_preparation_description")
@@ -24,6 +25,10 @@ public class DocumentsForPreparation {
 
     @Column(name = "documents_for_preparation_file_path")
     private String filePath;
+    @Column(name = "documents_for_preparation_media_type")
+    private String mediaType;
+    @Column(name = "documents_for_preparation_file_size")
+    private Long fileSize;
 
     public Integer getId() {
         return id;
@@ -45,6 +50,22 @@ public class DocumentsForPreparation {
         this.filePath = filePath;
     }
 
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,6 +85,8 @@ public class DocumentsForPreparation {
                 "id=" + id +
                 ", description='" + description + '\'' +
                 ", filePath='" + filePath + '\'' +
+                ", mediaType='" + mediaType + '\'' +
+                ", fileSize=" + fileSize +
                 '}';
     }
 }
