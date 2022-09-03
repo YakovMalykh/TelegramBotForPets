@@ -69,8 +69,10 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
             document.setMediaType(file.getContentType());
 
             documentsForPreparationRepository.save(document);
+            logger.info("вызван метода saveDocumentToDB, файл сохранен в БД");
             return ResponseEntity.ok().build();
         } else {
+            logger.info("при вызове метода saveDocumentToDB, были переданы некорректные параметры");
             return ResponseEntity.badRequest().build();
         }
     }
@@ -99,6 +101,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
     @Override
     public ResponseEntity<Void> editDocuments(String description, MultipartFile file) throws IOException {
         if (description == null && file == null) {
+            logger.info("при вызове метода editDocuments переданы некорректные данные");
             return ResponseEntity.badRequest().build();
         } else {
             DocumentsForPreparation document =
@@ -137,8 +140,10 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
                  * сохраняю обновленный вокументы в БД
                  */
                 documentsForPreparationRepository.save(document);
+                logger.info("метод editDocuments - файл в папке и документ в БД обновлены");
                 return ResponseEntity.ok().build();
             } else {
+                logger.info("метод editDocuments - документа с таким description в БД не существует");
                 return ResponseEntity.notFound().build();
             }
         }
@@ -148,10 +153,13 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
     @Override
     public ResponseEntity<DocumentsForPreparation> getDocument(Integer documentId) {
         if (documentId == 0) {
+            logger.info("при вызове метода getDocument передан некорректный параметр");
             return ResponseEntity.badRequest().build();
         } else if (!documentsForPreparationRepository.existsById(documentId)) {
+            logger.info("метод getDocument - документ с таким documentId в БД не найден");
             return ResponseEntity.notFound().build();
         } else {
+            logger.info("метод getDocument - получен документ из БД по documentId");
             return ResponseEntity.ok(documentsForPreparationRepository.findById(documentId).get());
         }
     }
@@ -167,13 +175,16 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
     @Override
     public ResponseEntity<Collection<DocumentsForPreparation>> getDocuments(String partDescription) {
         if (partDescription == null || partDescription.isEmpty() || partDescription.isBlank()) {
+            logger.info("метод getDocuments - переданы некорретные параметры");
             return ResponseEntity.badRequest().build();
         } else {
             List<DocumentsForPreparation> listDocByPartDiscription =
                     documentsForPreparationRepository.findByDescriptionContainingIgnoreCase(partDescription);
             if (listDocByPartDiscription.isEmpty()) {
+                logger.info("метод getDocuments - документы по заданным параметрам в БД не найдены");
                 return ResponseEntity.notFound().build();
             } else {
+                logger.info("метод getDocuments - вернул список документов по части description");
                 return ResponseEntity.ok(listDocByPartDiscription);
             }
         }
@@ -181,19 +192,22 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
 
     @Override
     public ResponseEntity<Collection<DocumentsForPreparation>> getAllDocuments() {
+        logger.info("метод getAllDocuments - вернул список всех имеющихся документов в БД");
         return ResponseEntity.ok(documentsForPreparationRepository.findAll());
     }
 
     /**
      * @param documentId
      * @return
-     * @throws HttpClientErrorException.BadRequest,HttpClientErrorException.NotFound
+     * @throws IOException
      */
     @Override
     public ResponseEntity<Void> removeDocument(Integer documentId) throws IOException{
         if (documentId == 0) {
+            logger.info("метод removeDocument - передан некоррекнтый параметр");
             return ResponseEntity.badRequest().build();
         } else if (!documentsForPreparationRepository.existsById(documentId)) {
+            logger.info("метод removeDocument - документа с таким ID в БД не существует");
             return ResponseEntity.notFound().build();
         } else {
 
@@ -202,6 +216,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
             Files.deleteIfExists(filePath);
 
             documentsForPreparationRepository.deleteById(documentId);
+            logger.info("метод removeDocument - файл из папки и документ из БД удалены");
             return ResponseEntity.ok().build();
         }
     }
