@@ -36,3 +36,7 @@ CREATE TABLE IF NOT EXISTS documents_for_preparation
     documents_for_preparation_description VARCHAR (255),
     documents_for_preparation_file_path VARCHAR (255)
 );
+-- changeset ymalykh:4
+ALTER TABLE documents_for_preparation ADD COLUMN documents_for_preparation_media_type VARCHAR (255);
+ALTER TABLE documents_for_preparation ADD COLUMN documents_for_preparation_file_size BIGINT;
+
