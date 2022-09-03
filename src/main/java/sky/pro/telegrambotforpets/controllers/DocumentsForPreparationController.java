@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.webjars.NotFoundException;
+import sky.pro.telegrambotforpets.constants.Descriptions;
 import sky.pro.telegrambotforpets.interfaces.DocumentsForPreparationService;
 import sky.pro.telegrambotforpets.model.DocumentsForPreparation;
 
@@ -43,6 +44,11 @@ public class DocumentsForPreparationController {
                     @ApiResponse(
                             responseCode = "404",
                             description = "если документа по указанному пути не существует"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "если передано недопустимое описание документа, т.е. " +
+                                    "такого элемента нет в enum Descriptions"
                     )
             },
             tags = "Сохранение и редактирование документов"
@@ -54,16 +60,17 @@ public class DocumentsForPreparationController {
                     "PREPARING_HOUSE_FOR_A_PUPPY, PREPARING_HOUSE_FOR_AN_ADULT_DOG, " +
                     "PREPARING_HOUSE_FOR_A_DISABLED_DOG, DOGHANDLER_ADVICIES, REASONS_FOR_REFUSAL",
                     example = "PREPARING_HOUSE_FOR_A_PUPPY")
-            @RequestParam(name = "описание из предложенных вариантов") String description,
+            @RequestParam(name = "здесь используется enum Descriptions") Descriptions description,
             @RequestParam(name = "загружаем файл") MultipartFile file) {
         try {
-            docForPrepService.saveDocumentToDB(description, file);
+            docForPrepService.saveDocumentToDB(description.name(), file);
         } catch (IOException ioException) {
             ioException.printStackTrace();
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().build();
     }
+
 
     @Operation(
             summary = "редактирование существующего документа в БД и замена файла в папке на новый",
@@ -75,6 +82,11 @@ public class DocumentsForPreparationController {
                     @ApiResponse(
                             responseCode = "404",
                             description = "если документа по указанному пути не существует"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "если передано недопустимое описание документа, т.е. " +
+                                    "такого элемента нет в enum Descriptions"
                     )
             },
             tags = "Сохранение и редактирование документов"
@@ -87,16 +99,17 @@ public class DocumentsForPreparationController {
                     "PREPARING_HOUSE_FOR_A_PUPPY, PREPARING_HOUSE_FOR_AN_ADULT_DOG, " +
                     "PREPARING_HOUSE_FOR_A_DISABLED_DOG, DOGHANDLER_ADVICIES, REASONS_FOR_REFUSAL",
                     example = "PREPARING_HOUSE_FOR_A_PUPPY")
-            @RequestParam(name = "описание из предложенных вариантов") String description,
+            @RequestParam(name = "здесь используется enum Descriptions") Descriptions description,
             @RequestParam(name = "загружаем файл") MultipartFile file) {
         try {
-            docForPrepService.editDocuments(description, file);
+            docForPrepService.editDocuments(description.name(), file);
         } catch (IOException ioException) {
             ioException.printStackTrace();
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().build();
     }
+
 
     @Operation(
             summary = "поиск документа по ID",
@@ -126,7 +139,7 @@ public class DocumentsForPreparationController {
     @GetMapping(value = "/{documentId}")
     public ResponseEntity<Void> getDocument(
             @Parameter(description = "ID документа в БД", example = "4")
-            @PathVariable(name = "ID документа") Integer documentId,
+            @PathVariable Integer documentId,
             HttpServletResponse response) throws IOException {
 
         DocumentsForPreparation document = docForPrepService.getDocument(documentId).getBody();
@@ -177,8 +190,9 @@ public class DocumentsForPreparationController {
     @GetMapping
     public ResponseEntity<Collection<DocumentsForPreparation>> getListOfDocuments(
             @Parameter(description = "параметр необязательный, вводится часть описания документа. " +
-                    "Если параметр непустой, то вызывается метод поиска по части описания, если же " +
-                    "параметр пустой, то вызовется метод получения всех документов из БД", example = "прав")
+                    "Если параметр непустой, то вызывается метод поиска по части описания игнорируя регистр," +
+                    " если же параметр пустой, то вызовется метод получения всех документов из БД",
+                    example = "dog")
             @RequestParam(required = false, name = "часть описания документа") String partDescription) {
         if (partDescription != null) {
             return docForPrepService.getDocuments(partDescription);
@@ -186,6 +200,7 @@ public class DocumentsForPreparationController {
             return docForPrepService.getAllDocuments();
         }
     }
+
 
     @Operation(
             summary = "удаление документа из БД и файла из папки по переданному ID",
@@ -203,7 +218,7 @@ public class DocumentsForPreparationController {
     @DeleteMapping(value = "/{documentId}")
     public ResponseEntity<Void> removeDocument(
             @Parameter(description = "ID документа в БД")
-            @PathVariable(name = "ID документа") Integer documentId) throws IOException {
+            @PathVariable Integer documentId) throws IOException {
         return docForPrepService.removeDocument(documentId);
     }
 
