@@ -141,12 +141,12 @@ public abstract class Person {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return id.equals(person.id);
+        return id.equals(person.id) && name.equals(person.name) && Objects.equals(middleName, person.middleName) && lastName.equals(person.lastName) && Objects.equals(gender, person.gender) && Objects.equals(birthday, person.birthday) && phoneNumber.equals(person.phoneNumber) && address.equals(person.address);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, name, middleName, lastName, gender, birthday, phoneNumber, address);
     }
 
     @Override

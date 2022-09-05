@@ -42,6 +42,19 @@ public class DogHandler extends Person {
         this.description = description;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        DogHandler that = (DogHandler) o;
+        return Objects.equals(idChat, that.idChat) && Objects.equals(description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), idChat, description);
+    }
 
     @Override
     public String toString() {
