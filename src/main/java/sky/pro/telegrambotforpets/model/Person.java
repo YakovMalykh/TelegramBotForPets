@@ -1,5 +1,9 @@
 package sky.pro.telegrambotforpets.model;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import java.util.Date;
 import java.util.Objects;
 
@@ -8,7 +12,12 @@ import java.util.Objects;
  * вводим абстаркатный класс, чтобы впоследствии от него можно было наследовать Усыновителя,
  * Кинолога и, возможно, Волонтера
  */
+@MappedSuperclass
 public abstract class Person {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private String middleName;
     private String lastName;
@@ -29,6 +38,10 @@ public abstract class Person {
         this.birthday = birthday;
         this.phoneNumber = phoneNumber;
         this.address = address;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
@@ -128,22 +141,25 @@ public abstract class Person {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return Objects.equals(name, person.name) && Objects.equals(middleName, person.middleName) && Objects.equals(lastName, person.lastName) && Objects.equals(gender, person.gender) && Objects.equals(birthday, person.birthday) && Objects.equals(phoneNumber, person.phoneNumber);
+        return id.equals(person.id) && name.equals(person.name) && Objects.equals(middleName, person.middleName) && lastName.equals(person.lastName) && Objects.equals(gender, person.gender) && Objects.equals(birthday, person.birthday) && phoneNumber.equals(person.phoneNumber) && address.equals(person.address);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, middleName, lastName, gender, birthday, phoneNumber);
+        return Objects.hash(id, name, middleName, lastName, gender, birthday, phoneNumber, address);
     }
 
     @Override
     public String toString() {
-        return " " + "name='" + name + '\'' +
+        return "Person{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", middleName='" + middleName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", gender='" + gender + '\'' +
                 ", birthday=" + birthday +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                ", address='" + address;
+                ", address='" + address + '\'' +
+                '}';
     }
 }

@@ -51,8 +51,7 @@ public class DocumentsForPreparationController {
                                     "такого элемента нет в enum Descriptions или документ с таким" +
                                     "описанием уже существует"
                     )
-            },
-            tags = "Сохранение и редактирование документов"
+            }
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> saveDocumentToDb(
@@ -92,8 +91,7 @@ public class DocumentsForPreparationController {
                             description = "если передано недопустимое описание документа, т.е. " +
                                     "такого элемента нет в enum Descriptions"
                     )
-            },
-            tags = "Сохранение и редактирование документов"
+            }
     )
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> editDocument(
@@ -129,8 +127,7 @@ public class DocumentsForPreparationController {
                             responseCode = "404",
                             description = "Если докуента по переданному ID нет в БД"
                     )
-            },
-            tags = "получение документов"
+            }
     )
     /**
      * метод вычитывает файл из его папки
@@ -180,8 +177,7 @@ public class DocumentsForPreparationController {
                                     )
                             )
                     )
-            },
-            tags = "получение документов"
+            }
     )
     /**
      * возвращает список документов в формате json. Если вызвать без параметра, то выдаст список всех
@@ -228,3 +224,5 @@ public class DocumentsForPreparationController {
 
 
 }
+
+

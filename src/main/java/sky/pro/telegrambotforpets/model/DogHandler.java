@@ -10,29 +10,9 @@ import java.util.Objects;
  * Отображается на таблицу <b>doghandler</b>
  */
 @Entity
-//@Table(name = "doghandler")
 public class DogHandler extends Person {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     private Long idChat;
-    /**
-     * объявляю здесь все поля родительского класса, иначе они не создаются в таблице
-     */
-    private String name;
-
-    private String middleName;
-
-    private String lastName;
-
-    private String gender;
-
-    private Date birthday;
-
-    private String phoneNumber;
-
-    private String address;
     private String description;
 
     public DogHandler() {
@@ -62,27 +42,25 @@ public class DogHandler extends Person {
         this.description = description;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         DogHandler that = (DogHandler) o;
-        return id.equals(that.id);
+        return Objects.equals(idChat, that.idChat) && Objects.equals(description, that.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(super.hashCode(), idChat, description);
     }
 
     @Override
     public String toString() {
         return "DogHandler{" +
-                "id=" + id +
-                ", idChat=" + idChat +
+                "idChat=" + idChat +
                 ", description='" + description + '\'' +
-                '}' + super.toString();
+                '}'+ super.toString();
     }
-
 }
