@@ -11,6 +11,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sky.pro.telegrambotforpets.constants.Descriptions;
 import sky.pro.telegrambotforpets.interfaces.GuestService;
 import sky.pro.telegrambotforpets.services.GuestServiceImpl;
 
