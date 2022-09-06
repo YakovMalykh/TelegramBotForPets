@@ -31,7 +31,7 @@ public class SendInChatServiceImpl implements SendInChatService {
 
     public void sendDoc(Long chatId, Descriptions descriptionFile) {
         DocumentsForPreparation fileDoc = documentsForPreparationRepository.findDocumentsForPreparationByDescription(descriptionFile.toString());
-        if (!(fileDoc == null)) {
+        if (fileDoc != null){
             File sendFile = new File(fileDoc.getFilePath());
             SendDocument document = new SendDocument(chatId, sendFile);
             SendResponse sendResponse = telegramBot.execute(document);

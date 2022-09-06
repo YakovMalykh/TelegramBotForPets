@@ -199,7 +199,7 @@ public class DocumentsForPreparationController {
         }
     }
 
-    @GetMapping("descript")
+    @GetMapping("/description")
     public ResponseEntity<DocumentsForPreparation> getDocumentsByDescription(
 
             @RequestParam(required = false, name = "описание документа") String description) {
