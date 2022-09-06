@@ -24,21 +24,21 @@ public class Shelter {
     private String adress;
 //    shelter_adress VARCHAR(255),
 
-    @Column(name = "shelter_mappach")
-    private String mapPach;
-//    shelter_mappach VARCHAR(255),
+    @Column(name = "shelter_mappath")
+    private String mapPath;
+//    shelter_mappath VARCHAR(255),
 
-    @Column(name = "shelter_recomendationpach")
-    private String recomendationPach;
-//    shelter_recomendationpach VARCHAR(255),
+    @Column(name = "shelter_recomendationpath")
+    private String recomendationPath;
+//    shelter_recomendationpath VARCHAR(255),
 
     @Column(name = "shelter_schedule")
     private String schedule;
 //    shelter_schedule VARCHAR(255),
 
-    @Column(name = "shelter_specification")
-    private String specification;
-//    shelter_specification VARCHAR(255),
+    @Column(name = "shelter_specialization")
+    private String specialization;
+//    shelter_specialization VARCHAR(255),
 
     @Column(name = "shelter_description")
     private String description;
@@ -68,20 +68,20 @@ public class Shelter {
         this.adress = adress;
     }
 
-    public String getMapPach() {
-        return mapPach;
+    public String getMapPath() {
+        return mapPath;
     }
 
-    public void setMapPach(String mapPach) {
-        this.mapPach = mapPach;
+    public void setMapPath(String mapPath) {
+        this.mapPath = mapPath;
     }
 
-    public String getRecomendationPach() {
-        return recomendationPach;
+    public String getRecomendationPath() {
+        return recomendationPath;
     }
 
-    public void setRecomendationPach(String recomendationPach) {
-        this.recomendationPach = recomendationPach;
+    public void setRecomendationPath(String recomendationPath) {
+        this.recomendationPath = recomendationPath;
     }
 
     public String getSchedule() {
@@ -92,12 +92,12 @@ public class Shelter {
         this.schedule = schedule;
     }
 
-    public String getSpecification() {
-        return specification;
+    public String getSpecialization() {
+        return specialization;
     }
 
-    public void setSpecification(String specification) {
-        this.specification = specification;
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
     }
 
     public String getDescription() {
@@ -127,10 +127,10 @@ public class Shelter {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", adress='" + adress + '\'' +
-                ", mapPach='" + mapPach + '\'' +
-                ", recomendationPach='" + recomendationPach + '\'' +
+                ", mapPach='" + mapPath + '\'' +
+                ", recomendationPach='" + recomendationPath + '\'' +
                 ", schedule='" + schedule + '\'' +
-                ", specification='" + specification + '\'' +
+                ", specification='" + specialization + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }

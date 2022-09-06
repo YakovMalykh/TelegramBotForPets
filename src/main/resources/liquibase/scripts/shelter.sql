@@ -13,3 +13,7 @@ CREATE TABLE IF NOT EXISTS shelter
     shelter_specification VARCHAR(255),
     shelter_description VARCHAR(255)
 );
+-- changeset ymalykh:2
+ALTER TABLE shelter RENAME COLUMN shelter_mappach to shelter_mappath;
+ALTER TABLE shelter RENAME COLUMN shelter_recomendationpach to shelter_recomendationpath;
+ALTER TABLE shelter RENAME COLUMN shelter_specification to shelter_specialization;
