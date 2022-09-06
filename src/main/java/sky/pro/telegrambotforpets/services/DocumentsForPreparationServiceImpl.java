@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -26,7 +25,7 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Transactional
 public class DocumentsForPreparationServiceImpl implements DocumentsForPreparationService {
 
-    private Logger logger = LoggerFactory.getLogger(DocumentsForPreparationServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(DocumentsForPreparationServiceImpl.class);
 
     @Value("${path.to.documents-for-preparation.folder}")
     private String documentsPrepFolder;
@@ -221,6 +220,11 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
             logger.info("метод removeDocument - файл из папки и документ из БД удалены");
             return ResponseEntity.ok().build();
         }
+    }
+
+    @Override
+    public ResponseEntity<DocumentsForPreparation> getDocumentsByDescription(String description) {
+        return ResponseEntity.ok(documentsForPreparationRepository.findDocumentsForPreparationByDescription(description));
     }
 
 }

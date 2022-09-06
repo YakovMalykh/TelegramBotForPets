@@ -5,13 +5,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.webjars.NotFoundException;
 import sky.pro.telegrambotforpets.constants.Descriptions;
 import sky.pro.telegrambotforpets.interfaces.DocumentsForPreparationService;
 import sky.pro.telegrambotforpets.model.DocumentsForPreparation;
@@ -201,7 +199,13 @@ public class DocumentsForPreparationController {
         }
     }
 
+    @GetMapping("descript")
+    public ResponseEntity<DocumentsForPreparation> getDocumentsByDescription(
 
+            @RequestParam(required = false, name = "описание документа") String description) {
+          return docForPrepService.getDocumentsByDescription(description);
+
+    }
     @Operation(
             summary = "удаление документа из БД и файла из папки по переданному ID",
             responses = {

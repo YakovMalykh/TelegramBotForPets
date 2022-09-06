@@ -3,17 +3,15 @@ package sky.pro.telegrambotforpets.listener;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.request.Keyboard;
-import com.pengrad.telegrambot.model.request.ParseMode;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sky.pro.telegrambotforpets.constants.Descriptions;
 import sky.pro.telegrambotforpets.interfaces.GuestService;
+import sky.pro.telegrambotforpets.interfaces.SendInChatService;
+import sky.pro.telegrambotforpets.menu.ReplyKeyboard;
 import sky.pro.telegrambotforpets.model.Guest;
+import sky.pro.telegrambotforpets.repositories.DocumentsForPreparationRepository;
 import sky.pro.telegrambotforpets.repositories.GuestRepository;
 import sky.pro.telegrambotforpets.services.GuestServiceImpl;
 
@@ -21,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 import static sky.pro.telegrambotforpets.constants.Constants.*;
+import static sky.pro.telegrambotforpets.constants.Descriptions.*;
 
 /**
  * отвечает за работу телеграм бота
@@ -33,13 +32,17 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private TelegramBot telegramBot;
 
     private final GuestService guestService;
+    private final SendInChatService sendInChatService;
     private final sky.pro.telegrambotforpets.menu.ReplyKeyboard replyKeyboard;
     private final GuestRepository guestRepository;
 
-    public TelegramBotUpdatesListener(GuestServiceImpl guestService, sky.pro.telegrambotforpets.menu.ReplyKeyboard replyKeyboard,GuestRepository guestRepository) {
+
+    public TelegramBotUpdatesListener(GuestServiceImpl guestService, SendInChatService sendInChatService, ReplyKeyboard replyKeyboard, GuestRepository guestRepository, DocumentsForPreparationRepository documentsForPreparationRepository) {
         this.guestService = guestService;
+        this.sendInChatService = sendInChatService;
         this.replyKeyboard = replyKeyboard;
-        this.guestRepository=guestRepository;
+        this.guestRepository = guestRepository;
+
     }
 
     @PostConstruct
@@ -47,7 +50,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         telegramBot.setUpdatesListener(this);
     }
 
-    private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
     @Override
     public int process(List<Update> updates) {
@@ -66,82 +69,84 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 if (!(update.message().text() == null)) {
                     switch (update.message().text()) {
                         case MENU_1_BUTTON_1 -> {
-                            sendMsg(chatId, "Информация о приюте");
-                            sendMenu(replyKeyboard.Menu0_1(), chatId);
+                            sendInChatService.sendMsg(chatId, "Информация о приюте");
+                            sendInChatService.sendMenu( chatId,replyKeyboard.Menu0_1());
                         }
-                        case MENU_1_1_BUTTON_1 -> sendMsg(chatId, "Здесь будем выдавать описание приюта");
-                        case MENU_1_1_BUTTON_2 -> sendMsg(chatId, "Расписание и адрес приюта");
-                        case MENU_1_1_BUTTON_3 -> sendMsg(chatId, "Техника безопасности на территории приюта");
+                        case MENU_1_1_BUTTON_1 ->
+                                sendInChatService.sendMsg(chatId, "Здесь будем выдавать описание приюта");
+                        case MENU_1_1_BUTTON_2 -> sendInChatService.sendMsg(chatId, "Расписание и адрес приюта");
+                        case MENU_1_1_BUTTON_3 ->
+                                sendInChatService.sendMsg(chatId, "Техника безопасности на территории приюта");
                         case MENU_1_1_BUTTON_4 -> {
-                            sendMsg(chatId, "Оставить контакт");
+                            sendInChatService.sendMsg(chatId, "Оставить контакт");
                         }
                         case MENU_1_BUTTON_2 -> {
                             //Здесь будет ответ на запрос Как взять питомца
-                            sendMsg(chatId, "Как взять питомца из приюта");
-                            sendMenu(replyKeyboard.Menu0_2(), chatId);
+                            sendInChatService.sendMsg(chatId, "Как взять питомца из приюта");
+                            sendInChatService.sendMenu( chatId, replyKeyboard.Menu0_2());
                         }
-                        case MENU_1_2_BUTTON_1 -> sendMsg(chatId, "Правила знакомства с питомцем");
-                        case MENU_1_2_BUTTON_2 -> sendMsg(chatId, "Документы необходимые, чтобы взять питомца");
-                        case MENU_1_2_BUTTON_3 -> sendMsg(chatId, "Рекомендации по транспортировке питомца");
-                        case MENU_1_2_BUTTON_4 -> sendMsg(chatId, "Рекомендации по обустройству дома для щенка");
-                        case MENU_1_2_BUTTON_5 ->
-                                sendMsg(chatId, "Рекомендации по обустройству дома для взрослой собаки");
-                        case MENU_1_2_BUTTON_6 ->
-                                sendMsg(chatId, "Рекомендации по обустройству дома для собаки с ограниченными возможностями");
-                        case MENU_1_2_BUTTON_7 -> sendMsg(chatId, "Советы кинолога по первичному общению с питомцем");
-                        case MENU_1_2_BUTTON_8 -> sendMsg(chatId, "Список проверенных кинологов");
-                        case MENU_1_2_BUTTON_9 -> sendMsg(chatId, "Причины отказа в заборе питомца");
+                        case MENU_1_2_BUTTON_1 -> {
+                            sendInChatService.sendMsg(chatId, "Правила знакомства с питомцем");
+                            sendInChatService.sendDoc(chatId, DOG_DAITING_RULES);
+                        }
+                        case MENU_1_2_BUTTON_2 -> {
+                            sendInChatService.sendMsg(chatId, "Документы необходимые, чтобы взять питомца");
+                            sendInChatService.sendDoc(chatId, LIST_DOCUMENTS_FOR_ADOPTING);
+                        }
+                        case MENU_1_2_BUTTON_3 -> {
+                            sendInChatService.sendMsg(chatId, "Рекомендации по транспортировке питомца");
+                            sendInChatService.sendDoc(chatId, TRANSPORTATION_ADVICE);
+                        }
+                        case MENU_1_2_BUTTON_4 -> {
+                            sendInChatService.sendMsg(chatId, "Рекомендации по обустройству дома для щенка");
+                            sendInChatService.sendDoc(chatId, PREPARING_HOUSE_FOR_A_PUPPY);
+                        }
+                        case MENU_1_2_BUTTON_5 -> {
+                            sendInChatService.sendMsg(chatId, "Рекомендации по обустройству дома для взрослой собаки");
+                            sendInChatService.sendDoc(chatId, PREPARING_HOUSE_FOR_AN_ADULT_DOG);
+                        }
+                        case MENU_1_2_BUTTON_6 -> {
+                            sendInChatService.sendMsg(chatId, "Рекомендации по обустройству дома для собаки с ограниченными возможностями");
+                            sendInChatService.sendDoc(chatId, PREPARING_HOUSE_FOR_A_DISABLED_DOG);
+                        }
+                        case MENU_1_2_BUTTON_7 -> {
+                            sendInChatService.sendMsg(chatId, "Советы кинолога по первичному общению с питомцем");
+                            sendInChatService.sendDoc(chatId, DOGHANDLER_ADVICIES);
+                        }
+                        case MENU_1_2_BUTTON_8 -> {
+                            sendInChatService.sendMsg(chatId, "Список проверенных кинологов");
+
+                        }
+                        case MENU_1_2_BUTTON_9 -> {
+                            sendInChatService.sendMsg(chatId, "Причины отказа в заборе питомца");
+                            sendInChatService.sendDoc(chatId, REASONS_FOR_REFUSAL);
+                        }
                         case MENU_1_BUTTON_3 -> {
                             //Здесь будет Отправка отчета
-                            sendMsg(chatId, "Отправить отчет о питомце");
+                            sendInChatService.sendMsg(chatId, "Отправить отчет о питомце");
                         }
                         case MENU_1_BUTTON_4 -> {
                             //Здесь будем звать волонтера
-                            sendMsg(chatId, "Позвать волонтера");
+                            sendInChatService.sendMsg(chatId, "Позвать волонтера");
                         }
                         default -> {
                             //В ответ на неопознанную команду выдает меню
                             logger.info("Неккоректная команда");
-                            sendMenu(replyKeyboard.Menu0(), chatId);
+                            sendInChatService.sendMenu(chatId, replyKeyboard.Menu0());
                         }
                     }
                 }
             }
             if (!(update.message().contact() == null)) {
-                Guest guest=new Guest();
+                Guest guest = new Guest();
                 guest.setUserName(update.message().contact().firstName());
                 guest.setChatId(update.message().contact().userId());
                 guest.setPhoneNumber(update.message().contact().phoneNumber());
                 guestRepository.save(guest);
                 logger.info("Данные о госте занесены в БД");
-                System.out.println(update.message().contact());
             }
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
-
-    public void sendMsg(Long chatId, String text) {
-        SendMessage message = new SendMessage(chatId, text);
-        SendResponse responce = telegramBot.execute(message);
-        System.out.println(responce.isOk());
-        System.out.println(responce.errorCode());
-
-    }
-
-    private void sendMenu(Keyboard Menu, long chatId) {
-        SendMessage request = new SendMessage(chatId, "Выберите пункт меню")
-                .replyMarkup(Menu)
-                .parseMode(ParseMode.HTML)
-                .disableWebPagePreview(true);
-        SendResponse sendResponse = telegramBot.execute(request);
-        logger.info("Меню отправлено" + Menu);
-        if (!sendResponse.isOk()) {
-            int codeError = sendResponse.errorCode();
-            String description = sendResponse.description();
-
-        }
-
-    }
-
 
 }
