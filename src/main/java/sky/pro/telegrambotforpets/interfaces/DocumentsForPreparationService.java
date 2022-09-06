@@ -1,7 +1,5 @@
 package sky.pro.telegrambotforpets.interfaces;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,6 +49,6 @@ public interface DocumentsForPreparationService {
      */
     ResponseEntity<Void> removeDocument(Integer documentId) throws IOException;
 
-
+    ResponseEntity <DocumentsForPreparation> getDocumentsByDescription(String descriptions);
 
 }
