@@ -1,5 +1,7 @@
 package sky.pro.telegrambotforpets.model;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -62,11 +64,7 @@ public class Shelter {
     }
 
     public void setName(String name) {
-        if (name != null) {
-            this.name = name;
-        } else {
-            throw new IllegalArgumentException("передан null в качестве параметра");
-        }
+        this.name = name;
     }
 
     public String getAdress() {
@@ -74,11 +72,7 @@ public class Shelter {
     }
 
     public void setAdress(String adress) {
-        if (adress != null) {
-            this.adress = adress;
-        } else {
-            throw new IllegalArgumentException("передан null в качестве параметра");
-        }
+        this.adress = adress;
     }
 
     public String getMapPath() {
@@ -102,33 +96,15 @@ public class Shelter {
     }
 
     public void setSchedule(String schedule) {
-        if (schedule != null) {
-            this.schedule = schedule;
-        } else {
-            throw new IllegalArgumentException("передан null в качестве параметра");
-        }
+        this.schedule = schedule;
     }
 
     public String getSpecialization() {
         return specialization;
     }
 
-    /**
-     * допустимыпе значения DOGS, CATS
-     *
-     * @param specialization
-     */
     public void setSpecialization(String specialization) {
-        if (specialization != null) {
-            if (specialization.equalsIgnoreCase("DOGS") ||
-                    specialization.toUpperCase().equals("CATS")) {
-                this.specialization = specialization.toUpperCase();
-            } else {
-                throw new IllegalArgumentException("переданы некорректные параметры");
-            }
-        } else {
-            throw new IllegalArgumentException("передан null в качестве параметра");
-        }
+            this.specialization = specialization.toUpperCase();
     }
 
     public String getDescription() {
@@ -136,11 +112,7 @@ public class Shelter {
     }
 
     public void setDescription(String description) {
-        if (description != null) {
-            this.description = description;
-        } else {
-            throw new IllegalArgumentException("передан null в качестве параметра");
-        }
+        this.description = description;
     }
 
     public String getSecurityPhoneNumber() {
@@ -153,16 +125,12 @@ public class Shelter {
      * @param securityPhoneNumber
      */
     public void setSecurityPhoneNumber(String securityPhoneNumber) {
-        if (securityPhoneNumber != null && !(securityPhoneNumber.isBlank() && securityPhoneNumber.isEmpty())) {
-            this.securityPhoneNumber = securityPhoneNumber
-                    .replace("+7", "8")
-                    .replace(" ", "")
-                    .replace("-", "")
-                    .replace("(", "")
-                    .replace(")", "");
-        } else {
-            throw new IllegalArgumentException("введены некорректные данные");
-        }
+        this.securityPhoneNumber = securityPhoneNumber
+                .replace("+7", "8")
+                .replace(" ", "")
+                .replace("-", "")
+                .replace("(", "")
+                .replace(")", "");
     }
 
     @Override

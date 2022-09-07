@@ -1,11 +1,11 @@
 package sky.pro.telegrambotforpets.services;
 
-import liquibase.pro.packaged.F;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import sky.pro.telegrambotforpets.constants.Specialisations;
 import sky.pro.telegrambotforpets.interfaces.ShelterService;
 import sky.pro.telegrambotforpets.model.Shelter;
 import sky.pro.telegrambotforpets.repositories.ShelterRepository;
@@ -34,19 +34,20 @@ public class ShelterServiceImpl implements ShelterService {
 
     /**
      * сохраняет приют в БД
-     * @param shelter JSON
-     * @param howToGet - файл со схемой проезда
+     *
+     * @param shelter     JSON
+     * @param howToGet    - файл со схемой проезда
      * @param safetyRules - файл с правилами безопасности
      * @return true - когда сохранен успешно, false - когда такой приют уже есть
      * @throws IOException
-     * @see ShelterServiceImpl#saveFileToFolder(NamesOfFiles, MultipartFile, String)
+     * @see ShelterServiceImpl#saveFileToFolder
      */
     @Override
     public boolean saveShelterToDB(Shelter shelter, MultipartFile howToGet, MultipartFile safetyRules) throws IOException {
         String sheltersName = shelter.getName();
-        if (!shelterRepository.findAll().contains(sheltersName)) {
-            String pathToMap = saveFileToFolder(NamesOfFiles.HOWTOGET, howToGet, aboutShelterFolder);
-            String pathToRules = saveFileToFolder(NamesOfFiles.SAFETYRULES, safetyRules, aboutShelterFolder);
+        if (shelterRepository.findFirstByNameIgnoreCase(sheltersName) == null) {
+            String pathToMap = saveFileToFolder(TypeOfFiles.HOWTOGET, sheltersName, howToGet, aboutShelterFolder);
+            String pathToRules = saveFileToFolder(TypeOfFiles.SAFETYRULES, sheltersName, safetyRules, aboutShelterFolder);
             shelter.setMapPath(pathToMap);
             shelter.setRecomendationPath(pathToRules);
             shelterRepository.save(shelter);
@@ -61,23 +62,23 @@ public class ShelterServiceImpl implements ShelterService {
     /**
      * ввожу Enum для ограниения названий файлов
      */
-    private enum NamesOfFiles {
+    private enum TypeOfFiles {
         HOWTOGET, SAFETYRULES
     }
 
     /**
      * сохраняет файл в папку about-shelter, задает ему нужное название и возвращает путь к этому фалу
-     * в виде строки
+     * в виде строки. В название добавил навзвание приюта
      *
-     * @param namesOfFile  - имя выбираем из Enum @NamesOfFiles
+     * @param typeOfFiles  - имя выбираем из Enum @NamesOfFiles
      * @param file         - переданный пользователем файл
      * @param pathToFolder - путь к папке, куда сохраняем (прописана в @application.properties)
      * @return путь к файлу в виде строки
      * @throws IOException
      */
     private String saveFileToFolder(
-            NamesOfFiles namesOfFile, MultipartFile file, String pathToFolder) throws IOException {
-        Path filePath = Path.of(pathToFolder, namesOfFile.name() + "." + getExtention(file));
+            TypeOfFiles typeOfFiles, String sheltersName, MultipartFile file, String pathToFolder) throws IOException {
+        Path filePath = Path.of(pathToFolder, sheltersName + "-" + typeOfFiles.name() + "." + getExtention(file));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
 
@@ -92,29 +93,81 @@ public class ShelterServiceImpl implements ShelterService {
         logger.info("метод saveFileToFolder - файл сохранен -  " + filePath.toString());
         return filePath.toString();
     }
+
     private String getExtention(MultipartFile file) {
         String fileName = file.getOriginalFilename();
         return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
     @Override
-    public boolean editShelter(Shelter shelter) {
-
-        return false;
+    public boolean editShelter(Long id, String name, String address, String schedule, Specialisations specialization,
+                               String description, String securityPhoneNumber, MultipartFile howToGet,
+                               MultipartFile safetyRules
+    ) throws IOException {
+        Shelter shelter = getShelter(id);
+        if (shelter != null) {
+            if (name != null && !name.isEmpty()) {
+                shelter.setName(name);
+            }
+            if (address != null && !address.isEmpty()) {
+                shelter.setAdress(address);
+            }
+            if (schedule != null && !schedule.isEmpty()) {
+                shelter.setSchedule(schedule);
+            }
+            if (specialization != null) {
+                shelter.setSpecialization(specialization.name());
+            }
+            if (description != null && !description.isEmpty()) {
+                shelter.setDescription(description);
+            }
+            if (securityPhoneNumber != null && !securityPhoneNumber.isEmpty()) {
+                shelter.setSecurityPhoneNumber(securityPhoneNumber);
+            }
+            if (howToGet != null) {
+                String pathToMap = saveFileToFolder(TypeOfFiles.HOWTOGET,shelter.getName(), howToGet, aboutShelterFolder);
+                shelter.setMapPath(pathToMap);
+            }
+            if (safetyRules != null) {
+                String pathToRules = saveFileToFolder(TypeOfFiles.SAFETYRULES,shelter.getName(), safetyRules, aboutShelterFolder);
+                shelter.setRecomendationPath(pathToRules);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
+
+    /**
+     * ищет приют по id, может быть null
+     *
+     * @param id
+     * @return shelter
+     */
     @Override
     public Shelter getShelter(Long id) {
-        return null;
+        return shelterRepository.findById(id).get();
     }
 
+    /**
+     * возвращает все имеющиесы приюты в БД или пустой список
+     *
+     * @return List
+     */
     @Override
     public List<Shelter> getAllShelters() {
-        return null;
+        return shelterRepository.findAll();
     }
 
     @Override
     public boolean removeShelter(Long id) {
-        return false;
+        Shelter shelter = getShelter(id);
+        if (shelter != null) {
+            shelterRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
