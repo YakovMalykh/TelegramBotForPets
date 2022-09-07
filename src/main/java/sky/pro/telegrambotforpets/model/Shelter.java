@@ -13,6 +13,7 @@ public class Shelter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "shelter_id")
     private Long id;
 //  shelter_id BIGINT PRIMARY KEY,
 
@@ -28,6 +29,9 @@ public class Shelter {
     private String mapPath;
 //    shelter_mappath VARCHAR(255),
 
+    /**
+     * имеются в виду правила безопасности
+     */
     @Column(name = "shelter_recomendationpath")
     private String recomendationPath;
 //    shelter_recomendationpath VARCHAR(255),
@@ -42,8 +46,9 @@ public class Shelter {
 
     @Column(name = "shelter_description")
     private String description;
-//    shelter_description VARCHAR(255)
-
+    //    shelter_description VARCHAR(255)
+    @Column(name = "shelter_security_phone_number")
+    private String securityPhoneNumber;
 
     public Shelter() {
     }
@@ -57,7 +62,11 @@ public class Shelter {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (name != null) {
+            this.name = name;
+        } else {
+            throw new IllegalArgumentException("передан null в качестве параметра");
+        }
     }
 
     public String getAdress() {
@@ -65,7 +74,11 @@ public class Shelter {
     }
 
     public void setAdress(String adress) {
-        this.adress = adress;
+        if (adress != null) {
+            this.adress = adress;
+        } else {
+            throw new IllegalArgumentException("передан null в качестве параметра");
+        }
     }
 
     public String getMapPath() {
@@ -89,15 +102,33 @@ public class Shelter {
     }
 
     public void setSchedule(String schedule) {
-        this.schedule = schedule;
+        if (schedule != null) {
+            this.schedule = schedule;
+        } else {
+            throw new IllegalArgumentException("передан null в качестве параметра");
+        }
     }
 
     public String getSpecialization() {
         return specialization;
     }
 
+    /**
+     * допустимыпе значения DOGS, CATS
+     *
+     * @param specialization
+     */
     public void setSpecialization(String specialization) {
-        this.specialization = specialization;
+        if (specialization != null) {
+            if (specialization.equalsIgnoreCase("DOGS") ||
+                    specialization.toUpperCase().equals("CATS")) {
+                this.specialization = specialization.toUpperCase();
+            } else {
+                throw new IllegalArgumentException("переданы некорректные параметры");
+            }
+        } else {
+            throw new IllegalArgumentException("передан null в качестве параметра");
+        }
     }
 
     public String getDescription() {
@@ -105,7 +136,33 @@ public class Shelter {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        if (description != null) {
+            this.description = description;
+        } else {
+            throw new IllegalArgumentException("передан null в качестве параметра");
+        }
+    }
+
+    public String getSecurityPhoneNumber() {
+        return securityPhoneNumber;
+    }
+
+    /**
+     * сохраняем в БД номер телефона вида 89990001122
+     *
+     * @param securityPhoneNumber
+     */
+    public void setSecurityPhoneNumber(String securityPhoneNumber) {
+        if (securityPhoneNumber != null && !(securityPhoneNumber.isBlank() && securityPhoneNumber.isEmpty())) {
+            this.securityPhoneNumber = securityPhoneNumber
+                    .replace("+7", "8")
+                    .replace(" ", "")
+                    .replace("-", "")
+                    .replace("(", "")
+                    .replace(")", "");
+        } else {
+            throw new IllegalArgumentException("введены некорректные данные");
+        }
     }
 
     @Override
@@ -127,11 +184,12 @@ public class Shelter {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", adress='" + adress + '\'' +
-                ", mapPach='" + mapPath + '\'' +
-                ", recomendationPach='" + recomendationPath + '\'' +
+                ", mapPath='" + mapPath + '\'' +
+                ", recomendationPath='" + recomendationPath + '\'' +
                 ", schedule='" + schedule + '\'' +
-                ", specification='" + specialization + '\'' +
+                ", specialization='" + specialization + '\'' +
                 ", description='" + description + '\'' +
+                ", securityPhoneNumber='" + securityPhoneNumber + '\'' +
                 '}';
     }
 }
