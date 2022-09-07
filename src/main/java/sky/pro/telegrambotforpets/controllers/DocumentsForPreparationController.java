@@ -69,6 +69,7 @@ public class DocumentsForPreparationController {
             ioException.printStackTrace();
             return ResponseEntity.notFound().build();
         }
+
         return ResponseEntity.badRequest().build();
     }
 
