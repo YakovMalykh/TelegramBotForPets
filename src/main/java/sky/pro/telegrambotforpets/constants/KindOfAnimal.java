@@ -1,5 +1,5 @@
 package sky.pro.telegrambotforpets.constants;
 
-public enum Specialisations {
+public enum KindOfAnimal {
     DOGS,CATS
 }

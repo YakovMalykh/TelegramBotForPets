@@ -1,9 +1,6 @@
 package sky.pro.telegrambotforpets.model;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
 
@@ -21,6 +18,14 @@ public abstract class Pet {
     private Long breedId;// позже можно реализовать отдельный класс для пород
     private Boolean sterilized;
     private Boolean invalid;
+
+    /**
+     * соответствует Enum KindOfAnimal
+     */
+    private String kindOfAnimal;
+
+
+
 
     public Pet() {
     }

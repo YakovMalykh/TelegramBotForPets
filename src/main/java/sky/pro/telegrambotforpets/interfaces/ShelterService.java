@@ -1,7 +1,7 @@
 package sky.pro.telegrambotforpets.interfaces;
 
 import org.springframework.web.multipart.MultipartFile;
-import sky.pro.telegrambotforpets.constants.Specialisations;
+import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.model.Shelter;
 
 import java.io.IOException;
@@ -11,7 +11,7 @@ public interface ShelterService {
 
     boolean saveShelterToDB(Shelter shelter, MultipartFile howToGet, MultipartFile safetyRules) throws IOException;
 
-    boolean editShelter(Long id, String name, String address, String schedule, Specialisations specialization,
+    boolean editShelter(Long id, String name, String address, String schedule, KindOfAnimal kindOfAnimal,
                         String description, String securityPhoneNumber, MultipartFile howToGet,
                         MultipartFile safetyRules) throws IOException;
 
