@@ -1,9 +1,12 @@
 package sky.pro.telegrambotforpets.model;
 
+import sky.pro.telegrambotforpets.constants.Gender;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
@@ -22,7 +25,7 @@ public abstract class Person {
     private String middleName;
     private String lastName;
     private String gender;
-    private Date birthday;
+    private LocalDate birthday;
     private String phoneNumber;
     private String address;
 
@@ -30,7 +33,7 @@ public abstract class Person {
     }
 
     public Person(String name, String middleName, String lastName, String gender,
-                  Date birthday, String phoneNumber, String address) {
+                  LocalDate birthday, String phoneNumber, String address) {
         this.name = name;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -76,9 +79,6 @@ public abstract class Person {
      * здесь ввел Enum, т.к. думаю возможны и другие варианты обозначения пола: "W", "Ж", "М".
      * если вводить их, то Enum будет удобен
      */
-    private enum Gender {
-        M, F
-    }
 
     /**
      * проверяю, что только один символ и он может быть
@@ -96,11 +96,11 @@ public abstract class Person {
         }
     }
 
-    public Date getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 

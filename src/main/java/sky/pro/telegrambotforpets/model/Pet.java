@@ -1,6 +1,7 @@
 package sky.pro.telegrambotforpets.model;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
@@ -13,7 +14,10 @@ public abstract class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private Date birthday;
+    private LocalDate birthday;
+    /**
+     * проверяется на соответствеи Enum Gender
+     */
     private String gender;
     private Long breedId;// позже можно реализовать отдельный класс для пород
     private Boolean sterilized;
@@ -30,13 +34,14 @@ public abstract class Pet {
     public Pet() {
     }
 
-    public Pet(String name, Date birthday, String gender, Long breedId, Boolean sterilized, Boolean invalid) {
+    public Pet(String name, LocalDate birthday, String gender, Long breedId, Boolean sterilized, Boolean invalid, String kindOfAnimal) {
         this.name = name;
         this.birthday = birthday;
         this.gender = gender;
         this.breedId = breedId;
         this.sterilized = sterilized;
         this.invalid = invalid;
+        this.kindOfAnimal = kindOfAnimal;
     }
 
     public Long getId() {
@@ -51,11 +56,11 @@ public abstract class Pet {
         this.name = name;
     }
 
-    public Date getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 
@@ -89,6 +94,13 @@ public abstract class Pet {
 
     public void setInvalid(Boolean invalid) {
         this.invalid = invalid;
+    }
+    public String getKindOfAnimal() {
+        return kindOfAnimal;
+    }
+
+    public void setKindOfAnimal(String kindOfAnimal) {
+        this.kindOfAnimal = kindOfAnimal;
     }
 
     @Override

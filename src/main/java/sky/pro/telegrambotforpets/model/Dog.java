@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 public class Dog extends Pet{
@@ -14,6 +16,14 @@ public class Dog extends Pet{
 
     @OneToOne
     private DogAdopter dogAdopter;
+
+    public Dog() {
+    }
+
+    public Dog(String name, LocalDate birthday, String gender, Long breedId, Boolean sterilized, Boolean invalid, String kindOfAnimal, Shelter shelter) {
+        super(name, birthday, gender, breedId, sterilized, invalid, kindOfAnimal);
+        this.shelter = shelter;
+    }
 
     public Shelter getShelter() {
         return shelter;

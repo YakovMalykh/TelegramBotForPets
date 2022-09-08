@@ -15,6 +15,11 @@ public interface ShelterService {
                         String description, String securityPhoneNumber, MultipartFile howToGet,
                         MultipartFile safetyRules) throws IOException;
 
+    /**
+     * возвращает приют по ID
+     * @param id
+     * @return Shelter
+     */
     Shelter getShelter(Long id);
 
     List<Shelter> getAllShelters();
