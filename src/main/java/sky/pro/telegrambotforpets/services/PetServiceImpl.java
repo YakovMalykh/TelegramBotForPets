@@ -22,8 +22,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static sky.pro.telegrambotforpets.constants.KindOfAnimal.CATS;
-import static sky.pro.telegrambotforpets.constants.KindOfAnimal.DOGS;
+import static sky.pro.telegrambotforpets.constants.KindOfAnimal.*;
 
 @Service
 public class PetServiceImpl implements PetService {
@@ -56,39 +55,48 @@ public class PetServiceImpl implements PetService {
     public boolean savePetToDB(String name, String birthDay, Gender gender, Long breedId, Boolean sterilized,
                                Boolean invalid, KindOfAnimal kindOfAnimal, Long shelterId) {
         Shelter shelter = shelterService.getShelter(shelterId);
-        String specialization = shelter.getSpecialization();
-        LocalDate parseDate = LocalDate.parse(birthDay, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        if (shelter != null) {
+            String specialization = shelter.getSpecialization();
 
-        if (kindOfAnimal == DOGS) {
-            if (specialization.equals(kindOfAnimal.name())) {
-                Dog dog = new Dog(name, parseDate, gender.name(), breedId, sterilized, invalid,
-                        kindOfAnimal.name(), shelter);
-                if (!petAlreadyExists(dog)) {
-                    dogRepository.save(dog);
-                    logger.info("метод savePetToDB - собака сохранена в БД: " + name);
-                    return true;
-                } else {
-                    logger.info("метод savePetToDB - такая собака уже есть в БД");
-                    return false;
-                }
+            LocalDate parseDate = LocalDate.parse(birthDay, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+
+            switch (kindOfAnimal) {
+                case DOGS:
+                    if (specialization.equals(kindOfAnimal.name())) {
+                        Dog dog = new Dog(name, parseDate, gender.name(), breedId, sterilized, invalid,
+                                kindOfAnimal.name(), shelter);
+                        if (!petAlreadyExists(dog)) {
+                            dogRepository.save(dog);
+                            logger.info("метод savePetToDB - собака сохранена в БД: " + name);
+                            return true;
+                        } else {
+                            logger.info("метод savePetToDB - такая собака уже есть в БД");
+                            return false;
+                        }
+                    }
+                    break;
+                case CATS:
+                    if (specialization.equals(kindOfAnimal.name())) {
+                        Cat cat = new Cat(name, parseDate, gender.name(), breedId, sterilized, invalid,
+                                kindOfAnimal.name(), shelter);
+                        if (!petAlreadyExists(cat)) {
+                            logger.info("метод savePetToDB - кошка сохранена в БД: " + name + ", id: " + cat.getId());
+                            catRepository.save(cat);
+                            return true;
+                        } else {
+                            logger.info("метод savePetToDB - такая кошка уже есть в БД");
+                            return false;
+                        }
+                    }
+                    break;
             }
-        } else if (kindOfAnimal == CATS) {
-            if (specialization.equals(kindOfAnimal.name())) {
-                Cat cat = new Cat(name, parseDate, gender.name(), breedId, sterilized, invalid,
-                        kindOfAnimal.name(), shelter);
-                if (!petAlreadyExists(cat)) {
-                    logger.info("метод savePetToDB - кошка сохранена в БД: " + name + ", id: " + cat.getId());
-                    catRepository.save(cat);
-                    return true;
-                } else {
-                    logger.info("метод savePetToDB - такая кошка уже есть в БД");
-                    return false;
-                }
-            }
+            logger.info("метод savePetToDB - выбран приют с неверной специализацией "
+                    + specialization + " вместо " + kindOfAnimal.name());
+            return false;
+        } else {
+            logger.info("приюта с таким Id нет в БД");
+            return false;
         }
-        logger.info("метод savePetToDB - выбран приют с неверной специализацией "
-                + specialization + " вместо " + kindOfAnimal.name());
-        return false;
     }
 
     @Override
@@ -119,6 +127,16 @@ public class PetServiceImpl implements PetService {
         return null;
     }
 
+    /**
+     * ищет питомца по имени в соответствующей виду животного таблице
+     *
+     * @param name
+     * @param kindOfAnimal
+     * @return Pet и наследников
+     * @see DogRepository#findByNameIgnoreCase
+     * @see CatRepository#findByNameIgnoreCase
+     */
+
     @Override
     public Pet getPetByName(String name, KindOfAnimal kindOfAnimal) {
         switch (kindOfAnimal) {
@@ -147,6 +165,14 @@ public class PetServiceImpl implements PetService {
         return null;
     }
 
+    /**
+     * получение всего списка питомцев данного вида
+     *
+     * @param kindOfAnimal
+     * @return Collection Dog or Cat
+     * @see CatRepository#findAll()
+     * @see DogRepository#findAll()
+     */
     @Override
     public Collection<? extends Pet> getListOfAllPets(KindOfAnimal kindOfAnimal) {
         switch (kindOfAnimal) {
@@ -167,8 +193,107 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    public boolean editPet(Long petId, KindOfAnimal kindOfAnimal, String name, String birthDay, Gender gender, Long breedId, Boolean sterilized, Boolean invalid, Long shelterId) {
+    public boolean editPet(Long petId, KindOfAnimal kindOfAnimal,
+                           String name, String birthDay, Gender gender, Long breedId,
+                           Boolean sterilized, Boolean invalid, Long shelterId) {
+
+        switch (kindOfAnimal) {
+            case DOGS -> {
+                try {
+                    Dog dog = dogRepository.findById(petId).get();
+                    checkAndFillFields(dog, name, birthDay, gender, breedId, sterilized, invalid, shelterId);
+                    logger.info("метод editPet - поляобновлены");
+                    return true;
+                } catch (NoSuchElementException e) {
+                    logger.info(e.toString());
+                    logger.info("метод editPet - питомца с таким ID нет ы БД");
+                    return false;
+                }
+            }
+            case CATS -> {
+                try {
+                    Cat cat = catRepository.findById(petId).get();
+                    checkAndFillFields(cat, name, birthDay, gender, breedId, sterilized, invalid, shelterId);
+                    logger.info("метод editPet - поляобновлены");
+                    return true;
+                } catch (NoSuchElementException e) {
+                    logger.info(e.toString());
+                    logger.info("метод editPet - питомца с таким ID нет ы БД");
+                    return false;
+                }
+            }
+        }
+
         return false;
+    }
+
+
+    /**
+     * проверяет на пустоту переданные параметры и если непустые обновляет поля в питомце
+     *
+     * @param pet
+     * @param name
+     * @param birthDay
+     * @param gender
+     * @param breedId
+     * @param sterilized
+     * @param invalid
+     * @param shelterId
+     */
+    private void checkAndFillFields(Pet pet, String name, String birthDay, Gender gender, Long breedId,
+                                    Boolean sterilized, Boolean invalid, Long shelterId) {
+        switch (valueOf(pet.getKindOfAnimal())) {
+            case DOGS -> {
+                Dog dog = dogRepository.findById(pet.getId()).get();
+                if (!(name == null && name.isEmpty() && name.isBlank())) {
+                    dog.setName(name);
+                }
+                if (!(birthDay == null && name.isEmpty() && name.isBlank())) {
+                    LocalDate parseDate = LocalDate.parse(birthDay, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                    dog.setBirthday(parseDate);
+                }
+                if (gender != null) {
+                    dog.setGender(gender.name());
+                }
+                if (breedId != null) {
+                    dog.setBreedId(breedId);
+                }
+                if (sterilized != null) {
+                    dog.setSterilized(sterilized);
+                }
+                if (invalid != null) {
+                    dog.setInvalid(invalid);
+                }
+                if (shelterId != null) {
+                    dog.setShelter(shelterService.getShelter(shelterId));
+                }
+            }
+            case CATS -> {
+                Cat cat = catRepository.findById(pet.getId()).get();
+                if (!(name == null && name.isEmpty() && name.isBlank())) {
+                    cat.setName(name);
+                }
+                if (!(birthDay == null && name.isEmpty() && name.isBlank())) {
+                    LocalDate parseDate = LocalDate.parse(birthDay, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                    cat.setBirthday(parseDate);
+                }
+                if (gender != null) {
+                    cat.setGender(gender.name());
+                }
+                if (breedId != null) {
+                    cat.setBreedId(breedId);
+                }
+                if (sterilized != null) {
+                    cat.setSterilized(sterilized);
+                }
+                if (invalid != null) {
+                    cat.setInvalid(invalid);
+                }
+                if (shelterId != null) {
+                    cat.setShelter(shelterService.getShelter(shelterId));
+                }
+            }
+        }
     }
 
     @Override
@@ -177,6 +302,15 @@ public class PetServiceImpl implements PetService {
         return false;
     }
 
+    /**
+     * удаляет питомца по ID из соответсвующей виду животного таблицы
+     *
+     * @param kindOfAnimal
+     * @param petId
+     * @return
+     * @see DogRepository#deleteById
+     * @see CatRepository#deleteById
+     */
     @Override
     public boolean removePet(KindOfAnimal kindOfAnimal, Long petId) {
         switch (kindOfAnimal) {

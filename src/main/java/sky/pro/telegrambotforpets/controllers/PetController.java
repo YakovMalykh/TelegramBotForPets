@@ -41,7 +41,8 @@ public class PetController {
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "выбрана неверный приют для данного вида животного или "
+                            description = "выбрана неверный приют для данного вида животного, такой питомец уже есть в БД" +
+                                    "или приюта с таким ID не существует"
                     )
             }
     )
@@ -72,6 +73,49 @@ public class PetController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @Operation(
+            summary = "редактирует питомца",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "указанные поля отредактированы"
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "питомец с таким Id не найден"
+                    )
+            }
+    )
+    @PutMapping
+    public ResponseEntity<Void> editPet(
+            @RequestParam Long petId,
+            @Parameter(description = "вид животного")
+            @RequestParam KindOfAnimal kindOfAnimal,
+            @Parameter(description = "кличка")
+            @RequestParam(required = false) String name,
+            @Parameter(description = "дата рождения. требуется строка вида dd.MM.yyyy")
+            @RequestParam(required = false) String birthDay,
+            @Parameter(description = "пол")
+            @RequestParam(required = false) Gender gender,
+            @Parameter(description = "id породы")
+            @RequestParam(required = false) Long breedId,
+            @Parameter(description = "стерилизован?")
+            @RequestParam(required = false) Boolean sterilized,
+            @Parameter(description = "инвалид?")
+            @RequestParam(required = false) Boolean invalid,
+            @Parameter(description = "ID приюта, в котором содержится животное")
+            @RequestParam(required = false) Long shelterId
+    ) {
+        boolean done = petService.editPet(petId, kindOfAnimal, name, birthDay, gender, breedId, sterilized,
+                invalid, shelterId);
+        if (done){
+            return ResponseEntity.ok().build();
+        }else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
     @Operation(
             summary = "Поиск по ID. По KindOfAnimal (вид животного)" +
