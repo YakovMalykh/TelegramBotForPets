@@ -4,4 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sky.pro.telegrambotforpets.model.Dog;
 
 public interface DogRepository extends JpaRepository<Dog,Long> {
+    Dog findByNameIgnoreCase(String name);
 }
