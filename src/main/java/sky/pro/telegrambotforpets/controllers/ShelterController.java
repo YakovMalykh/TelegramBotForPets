@@ -5,26 +5,20 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import liquibase.pro.packaged.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sky.pro.telegrambotforpets.constants.Specialisations;
+import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.interfaces.ShelterService;
 import sky.pro.telegrambotforpets.model.Shelter;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-
-import static ch.qos.logback.core.joran.action.ActionConst.NULL;
 
 @RestController
 @RequestMapping("/shelter")
@@ -61,9 +55,9 @@ public class ShelterController {
             @RequestParam String address,
             @Parameter(description = "график работы")
             @RequestParam String schedule,
-            @Parameter(description = "специализация. Здесь используется Enum Specialisations. " +
+            @Parameter(description = "специализация. Здесь используется Enum KindOfAnimal. " +
                     "Доступны 2 варианты: DOGS и CATS")
-            @RequestParam Specialisations specialization,
+            @RequestParam KindOfAnimal kindOfAnimal,
             @Parameter(description = "общая информация о приюте")
             @RequestParam String description,
             @Parameter(description = "номер телефона охраны", example = "89991112233")
@@ -74,7 +68,7 @@ public class ShelterController {
             @RequestParam MultipartFile safetyRules
     ) {
         if (name == null||name.isEmpty() || address == null||address.isEmpty() || schedule == null||schedule.isEmpty()
-                || specialization == null || description == null||description.isEmpty() || securityPhoneNumber == null
+                || kindOfAnimal == null || description == null||description.isEmpty() || securityPhoneNumber == null
                 || securityPhoneNumber.isEmpty() || securityPhoneNumber.isBlank()
         ) {
             throw new IllegalArgumentException("переданы некорректные параметры");
@@ -83,7 +77,7 @@ public class ShelterController {
         shelter.setName(name);
         shelter.setAdress(address);
         shelter.setSchedule(schedule);
-        shelter.setSpecialization(specialization.name());
+        shelter.setSpecialization(kindOfAnimal.name());
         shelter.setDescription(description);
         shelter.setSecurityPhoneNumber(securityPhoneNumber);
 
@@ -130,7 +124,7 @@ public class ShelterController {
             @RequestParam(required = false) String schedule,
             @Parameter(description = "специализация. Здесь используется Enum Specialisations." +
                     " Доступны 2 варианты: DOGS и CATS")
-            @RequestParam(required = false) Specialisations specialization,
+            @RequestParam(required = false) KindOfAnimal kindOfAnimal,
             @Parameter(description = "общая информация о приюте")
             @RequestParam(required = false) String description,
             @Parameter(description = "номер телефона охраны")
@@ -141,7 +135,7 @@ public class ShelterController {
             @RequestParam(required = false) MultipartFile safetyRules
     ) {
         try {
-            boolean done = shelterService.editShelter(id, name, address, schedule, specialization, description, securityPhoneNumber,
+            boolean done = shelterService.editShelter(id, name, address, schedule, kindOfAnimal, description, securityPhoneNumber,
                     howToGet, safetyRules);
             if (done) {
                 logger.info("метод editShelter - изменения внесены");

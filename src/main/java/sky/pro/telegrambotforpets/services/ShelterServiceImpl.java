@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import sky.pro.telegrambotforpets.constants.Specialisations;
+import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.interfaces.ShelterService;
 import sky.pro.telegrambotforpets.model.Shelter;
 import sky.pro.telegrambotforpets.repositories.ShelterRepository;
@@ -100,7 +100,7 @@ public class ShelterServiceImpl implements ShelterService {
     }
 
     @Override
-    public boolean editShelter(Long id, String name, String address, String schedule, Specialisations specialization,
+    public boolean editShelter(Long id, String name, String address, String schedule, KindOfAnimal kindOfAnimal,
                                String description, String securityPhoneNumber, MultipartFile howToGet,
                                MultipartFile safetyRules
     ) throws IOException {
@@ -115,8 +115,8 @@ public class ShelterServiceImpl implements ShelterService {
             if (schedule != null && !schedule.isEmpty()) {
                 shelter.setSchedule(schedule);
             }
-            if (specialization != null) {
-                shelter.setSpecialization(specialization.name());
+            if (kindOfAnimal != null) {
+                shelter.setSpecialization(kindOfAnimal.name());
             }
             if (description != null && !description.isEmpty()) {
                 shelter.setDescription(description);
