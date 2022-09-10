@@ -19,3 +19,6 @@ CREATE TABLE IF NOT EXISTS doghandler
 -- changeset ymalykh:2
 DROP TABLE IF EXISTS doghandler;
 
+-- changeset ymalykh:3
+ALTER TABLE dog_handler ALTER COLUMN birthday TYPE DATE;
+

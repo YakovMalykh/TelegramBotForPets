@@ -19,7 +19,7 @@ public class DogHandler extends Person {
     }
 
     public DogHandler(String name, String middleName, String lastName, String gender,
-                      Date birthday, String phoneNumber, String address, Long idChat,
+                      LocalDate birthday, String phoneNumber, String address, Long idChat,
                       String description) {
         super(name, middleName, lastName, gender, birthday, phoneNumber, address);
         this.idChat = idChat;

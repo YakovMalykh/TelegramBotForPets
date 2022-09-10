@@ -7,4 +7,6 @@ databaseChangeLog:
       file: liquibase/scripts/documentsForPreparation.sql
   - include:
       file: liquibase/scripts/doghandler.sql
+  - include:
+      file: liquibase/scripts/dog_cat_adopters.sql
 

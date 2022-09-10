@@ -1,8 +1,10 @@
 package sky.pro.telegrambotforpets.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -42,6 +44,9 @@ public class Shelter {
     private String schedule;
 //    shelter_schedule VARCHAR(255),
 
+    /**
+     *  specialization соответствует KindOfAnimal
+     */
     @Column(name = "shelter_specialization")
     private String specialization;
 //    shelter_specialization VARCHAR(255),
@@ -51,6 +56,14 @@ public class Shelter {
     //    shelter_description VARCHAR(255)
     @Column(name = "shelter_security_phone_number")
     private String securityPhoneNumber;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "shelter")
+    private Collection<Dog> dogs;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "shelter")
+    private Collection<Cat> cats;
 
     public Shelter() {
     }
@@ -102,7 +115,9 @@ public class Shelter {
     public String getSpecialization() {
         return specialization;
     }
-
+    /**
+     *  specialization соответствует KindOfAnimal
+     */
     public void setSpecialization(String specialization) {
             this.specialization = specialization.toUpperCase();
     }
@@ -131,6 +146,14 @@ public class Shelter {
                 .replace("-", "")
                 .replace("(", "")
                 .replace(")", "");
+    }
+
+    public Collection<Dog> getDogs() {
+        return dogs;
+    }
+
+    public Collection<Cat> getCats() {
+        return cats;
     }
 
     @Override
