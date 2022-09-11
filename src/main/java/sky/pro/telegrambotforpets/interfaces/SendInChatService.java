@@ -10,7 +10,7 @@ public interface SendInChatService {
     @param chatId
     @param descriptionFile
      */
-    void sendDoc(Long chatId, Descriptions descriptionFile);
+    void sendDocumentsForPreparation(Long chatId, Descriptions descriptionFile);
     /**
      метод отправляет сообщение в ответ на запрос
      @param chatId
@@ -23,4 +23,6 @@ public interface SendInChatService {
      @param Menu
      */
     void sendMenu(Long chatId, Keyboard Menu);
+
+   String chouseMenu (String button, Long chatId, Long shelterId);
 }
