@@ -342,7 +342,6 @@ public class PetServiceImpl implements PetService {
      * @see CatRepository#deleteById
      */
     @Override
-    @Transactional
     public boolean removePet(KindOfAnimal kindOfAnimal, Long petId) {
         switch (kindOfAnimal) {
             case DOGS -> {
@@ -367,7 +366,7 @@ public class PetServiceImpl implements PetService {
                     catRepository.delete(cat);
                     logger.info("метод removePet - кошка с id: " + petId + " удалена");
                     return true;
-                } catch (EmptyResultDataAccessException e) {
+                } catch (NoSuchElementException e) {
                     logger.info("метод removePet - кошки с id: " + petId + " в БД нет");
                     System.out.println(e);
                     return false;
