@@ -41,13 +41,14 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
      *
      * @param description
      * @param file
+     * @param kindOfAnimal
      * @return
      * @throws IOException
      */
     @Override
-    public boolean saveDocumentToDB(String description, MultipartFile file) throws IOException {
+    public boolean saveDocumentToDB(String description, MultipartFile file, String kindOfAnimal) throws IOException {
         DocumentsForPreparation docExists =
-                documentsForPreparationRepository.findFirstByDescriptionIgnoreCase(description);
+                documentsForPreparationRepository.findDocumentsForPreparationByDescriptionAndKindOfAnimal (description, kindOfAnimal);
 
         if (docExists == null) {
 
@@ -65,6 +66,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
                 bis.transferTo(bos);
             }
             DocumentsForPreparation document = new DocumentsForPreparation();
+            document.setKindOfAnimal(kindOfAnimal);
             document.setDescription(description);
             document.setFilePath(filePath.toString());
             document.setFileSize(file.getSize());
@@ -95,18 +97,20 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
      * создаю новый путь на основании нового файла и копирую новый файл в директорию по новому пути,
      * устанавливаю в документ новый путь к файлу, записываю обновленный документ в БД
      *
-     * @param description, file
+     * @param description
+     * @param file
+     * @param kindOfAnimal
      * @return
      * @throws IOException
      */
     @Override
-    public ResponseEntity<Void> editDocuments(String description, MultipartFile file) throws IOException {
-        if (description == null && file == null) {
+    public ResponseEntity<Void> editDocuments(String description, MultipartFile file, String kindOfAnimal) throws IOException {
+        if (description == null || file == null || kindOfAnimal == null) {
             logger.info("при вызове метода editDocuments переданы некорректные данные");
             return ResponseEntity.badRequest().build();
         } else {
             DocumentsForPreparation document =
-                    documentsForPreparationRepository.findFirstByDescriptionIgnoreCase(description);
+                    documentsForPreparationRepository.findDocumentsForPreparationByDescriptionAndKindOfAnimal(description, kindOfAnimal);
             if (document != null) {
 
                 /**
@@ -134,6 +138,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
                 /**
                  * вставляю новый путь, новый размер и новый контенттайп в документ
                  */
+                document.setKindOfAnimal(kindOfAnimal);
                 document.setFilePath(newFilePath.toString());
                 document.setFileSize(file.getSize());
                 document.setMediaType(file.getContentType());
