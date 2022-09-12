@@ -16,7 +16,7 @@ public interface DocumentsForPreparationService {
      * @return
      * @throws IOException
      */
-    boolean saveDocumentToDB(String description, MultipartFile file)throws IOException;
+    boolean saveDocumentToDB(String description, MultipartFile file, String kindOfAnimal)throws IOException;
     /**
      * equals проверяет только поле Id, поэтому при пересмотре логики equals
      * пересмотреть логику проверки в этом методе
@@ -27,7 +27,7 @@ public interface DocumentsForPreparationService {
      * @throws org.springframework.web.client.HttpClientErrorException.NotFound
      * @see DocumentsForPreparation#equals(Object)
      */
-    ResponseEntity<Void> editDocuments(String description, MultipartFile file)throws IOException;
+    ResponseEntity<Void> editDocuments(String description, MultipartFile file, String kindOfAnimal)throws IOException;
 
     ResponseEntity<DocumentsForPreparation> getDocument(Integer documentId);
 
