@@ -9,17 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sky.pro.telegrambotforpets.interfaces.GuestService;
 import sky.pro.telegrambotforpets.interfaces.SendInChatService;
-import sky.pro.telegrambotforpets.menu.ReplyKeyboard;
+import sky.pro.telegrambotforpets.menu.InlineKeyboard;
 import sky.pro.telegrambotforpets.model.Guest;
+import sky.pro.telegrambotforpets.model.Shelter;
 import sky.pro.telegrambotforpets.repositories.DocumentsForPreparationRepository;
 import sky.pro.telegrambotforpets.repositories.GuestRepository;
+import sky.pro.telegrambotforpets.repositories.ShelterRepository;
 import sky.pro.telegrambotforpets.services.GuestServiceImpl;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 
 import static sky.pro.telegrambotforpets.constants.Constants.*;
-import static sky.pro.telegrambotforpets.constants.Descriptions.*;
+import static sky.pro.telegrambotforpets.constants.Constants.MENU_1_1_BUTTON_4;
 
 /**
  * отвечает за работу телеграм бота
@@ -33,16 +35,18 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private final GuestService guestService;
     private final SendInChatService sendInChatService;
-    private final sky.pro.telegrambotforpets.menu.ReplyKeyboard replyKeyboard;
+    //  private final sky.pro.telegrambotforpets.menu.ReplyKeyboard replyKeyboard;
+    private final sky.pro.telegrambotforpets.menu.InlineKeyboard inlineKeyboard;
     private final GuestRepository guestRepository;
+    private final ShelterRepository shelterRepository;
 
-
-    public TelegramBotUpdatesListener(GuestServiceImpl guestService, SendInChatService sendInChatService, ReplyKeyboard replyKeyboard, GuestRepository guestRepository, DocumentsForPreparationRepository documentsForPreparationRepository) {
+    public TelegramBotUpdatesListener(GuestServiceImpl guestService, SendInChatService sendInChatService, GuestRepository guestRepository, DocumentsForPreparationRepository documentsForPreparationRepository, InlineKeyboard inlineKeyboard, ShelterRepository shelterRepository) {
         this.guestService = guestService;
         this.sendInChatService = sendInChatService;
-        this.replyKeyboard = replyKeyboard;
+        //  this.replyKeyboard = replyKeyboard; ReplyKeyboard replyKeyboard,
         this.guestRepository = guestRepository;
-
+        this.inlineKeyboard = inlineKeyboard;
+        this.shelterRepository = shelterRepository;
     }
 
     @PostConstruct
@@ -55,98 +59,74 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     @Override
     public int process(List<Update> updates) {
         updates.forEach(update -> {
-            if (update.message().chat().id() == null) {
-                try {
-                    throw new NoSuchMethodException();
-                } catch (NoSuchMethodException e) {
-                    throw new RuntimeException(e);
+            if (update.message() != null) {
+                if (update.message().text() != null) {
+                    if (!guestService.doesGuestAlreadyExistsInDB(update)) {
+                        guestService.saveGuestToDB(update);
+                    }
+                    logger.info("update " + update.message().text());
+                    sendInChatService.sendMenu(update.message().chat().id(), inlineKeyboard.Menu());
                 }
-            } else {
-                Long chatId = update.message().chat().id();
-                if (!guestService.doesGuestAlreadyExistsInDB(update)) {
-                    guestService.saveGuestToDB(update);
+                if (!(update.message().contact() == null)) {
+                    Guest guest = new Guest();
+                    guest.setUserName(update.message().contact().firstName());
+                    guest.setChatId(update.message().contact().userId());
+                    guest.setPhoneNumber(update.message().contact().phoneNumber());
+                    guestRepository.save(guest);
+                    logger.info("Данные о госте занесены в БД");
                 }
-                if (!(update.message().text() == null)) {
-                    switch (update.message().text()) {
-                        case MENU_1_BUTTON_1 -> {
-                            sendInChatService.sendMsg(chatId, "Информация о приюте");
-                            sendInChatService.sendMenu( chatId,replyKeyboard.Menu0_1());
+            } else if (update.callbackQuery() != null) {
+                Long chatId = update.callbackQuery().message().chat().id();
+                if (update.callbackQuery().data().split("/").length > 1) {
+                    String str = update.callbackQuery().data();
+                    String[] part = str.split("/");
+                    String button = part[1];
+                    Long shelterId = Long.valueOf(part[0]);
+                    logger.info(shelterId + " " + button);
+                    switch (button) {
+                        case MENU_1_BUTTON_1, MENU_1_BUTTON_2, MENU_1_BUTTON_3, MENU_1_BUTTON_4, MENU_1_1_BUTTON_1, MENU_1_1_BUTTON_2, MENU_1_1_BUTTON_3, MENU_1_1_BUTTON_4, MENU_1_1_BUTTON_5 -> {
+                            sendInChatService.chouseMenu(button, chatId, shelterId);
                         }
-                        case MENU_1_1_BUTTON_1 ->
-                                sendInChatService.sendMsg(chatId, "Здесь будем выдавать описание приюта");
-                        case MENU_1_1_BUTTON_2 -> sendInChatService.sendMsg(chatId, "Расписание и адрес приюта");
-                        case MENU_1_1_BUTTON_3 ->
-                                sendInChatService.sendMsg(chatId, "Техника безопасности на территории приюта");
-                        case MENU_1_1_BUTTON_4 -> {
-                            sendInChatService.sendMsg(chatId, "Оставить контакт");
+/*доработать после того как в таблицу document_for_preparation будет добавлен столбец с приютом
+                        case MENU_1_2_BUTTON_1, MENU_1_2_BUTTON_2, MENU_1_2_BUTTON_3, MENU_1_2_BUTTON_4, MENU_1_2_BUTTON_5, MENU_1_2_BUTTON_6, MENU_1_2_BUTTON_7, MENU_1_2_BUTTON_8, MENU_1_2_BUTTON_9 -> {
+                            sendInChatService.chouseMenu(button, chatId, shelterId);
                         }
-                        case MENU_1_BUTTON_2 -> {
-                            //Здесь будет ответ на запрос Как взять питомца
-                            sendInChatService.sendMsg(chatId, "Как взять питомца из приюта");
-                            sendInChatService.sendMenu( chatId, replyKeyboard.Menu0_2());
-                        }
-                        case MENU_1_2_BUTTON_1 -> {
-                            sendInChatService.sendMsg(chatId, "Правила знакомства с питомцем");
-                            sendInChatService.sendDoc(chatId, DOG_DAITING_RULES);
-                        }
-                        case MENU_1_2_BUTTON_2 -> {
-                            sendInChatService.sendMsg(chatId, "Документы необходимые, чтобы взять питомца");
-                            sendInChatService.sendDoc(chatId, LIST_DOCUMENTS_FOR_ADOPTING);
-                        }
-                        case MENU_1_2_BUTTON_3 -> {
-                            sendInChatService.sendMsg(chatId, "Рекомендации по транспортировке питомца");
-                            sendInChatService.sendDoc(chatId, TRANSPORTATION_ADVICE);
-                        }
-                        case MENU_1_2_BUTTON_4 -> {
-                            sendInChatService.sendMsg(chatId, "Рекомендации по обустройству дома для щенка");
-                            sendInChatService.sendDoc(chatId, PREPARING_HOUSE_FOR_A_PUPPY);
-                        }
-                        case MENU_1_2_BUTTON_5 -> {
-                            sendInChatService.sendMsg(chatId, "Рекомендации по обустройству дома для взрослой собаки");
-                            sendInChatService.sendDoc(chatId, PREPARING_HOUSE_FOR_AN_ADULT_DOG);
-                        }
-                        case MENU_1_2_BUTTON_6 -> {
-                            sendInChatService.sendMsg(chatId, "Рекомендации по обустройству дома для собаки с ограниченными возможностями");
-                            sendInChatService.sendDoc(chatId, PREPARING_HOUSE_FOR_A_DISABLED_DOG);
-                        }
-                        case MENU_1_2_BUTTON_7 -> {
-                            sendInChatService.sendMsg(chatId, "Советы кинолога по первичному общению с питомцем");
-                            sendInChatService.sendDoc(chatId, DOGHANDLER_ADVICIES);
-                        }
-                        case MENU_1_2_BUTTON_8 -> {
-                            sendInChatService.sendMsg(chatId, "Список проверенных кинологов");
 
+ */
+                        default -> sendInChatService.sendMsg(chatId,"Некорректная команда");
+                    }
+                } else {
+                    switch (update.callbackQuery().data()) {
+                        case MENU_0_BUTTON_1 -> {
+                            logger.info("выбран приют для собак");
+                            Shelter shelter = shelterRepository.findShelterBySpecialization("DOGS");
+                            if (shelter != null) {
+                                sendInChatService.sendMenu(chatId, inlineKeyboard.MenuCommon(shelter.getId()));
+                            } else {
+                                sendInChatService.sendMsg(chatId, "Такого приюта еще нет в базе данных, попробуйте выбрать другой");
+                                sendInChatService.sendMenu(chatId, inlineKeyboard.Menu());
+                            }
                         }
-                        case MENU_1_2_BUTTON_9 -> {
-                            sendInChatService.sendMsg(chatId, "Причины отказа в заборе питомца");
-                            sendInChatService.sendDoc(chatId, REASONS_FOR_REFUSAL);
-                        }
-                        case MENU_1_BUTTON_3 -> {
-                            //Здесь будет Отправка отчета
-                            sendInChatService.sendMsg(chatId, "Отправить отчет о питомце");
-                        }
-                        case MENU_1_BUTTON_4 -> {
-                            //Здесь будем звать волонтера
-                            sendInChatService.sendMsg(chatId, "Позвать волонтера");
-                        }
-                        default -> {
-                            //В ответ на неопознанную команду выдает меню
-                            logger.info("Неккоректная команда");
-                            sendInChatService.sendMenu(chatId, replyKeyboard.Menu0());
+                        case MENU_0_BUTTON_2 -> {
+                            logger.info("выбран приют для кошек");
+                            Shelter shelter = shelterRepository.findShelterBySpecialization("CATS");
+                            if (shelter != null) {
+                                sendInChatService.sendMenu(chatId, inlineKeyboard.MenuCommon(shelter.getId()));
+                            } else {
+                                sendInChatService.sendMsg(chatId, "Такого приюта еще нет в базе данных, попробуйте выбрать другой");
+                                sendInChatService.sendMenu(chatId, inlineKeyboard.Menu());
+                            }
                         }
                     }
+
                 }
             }
-            if (!(update.message().contact() == null)) {
-                Guest guest = new Guest();
-                guest.setUserName(update.message().contact().firstName());
-                guest.setChatId(update.message().contact().userId());
-                guest.setPhoneNumber(update.message().contact().phoneNumber());
-                guestRepository.save(guest);
-                logger.info("Данные о госте занесены в БД");
-            }
+
+
         });
+        logger.info("апдейт конфирм");
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
+
 
 }

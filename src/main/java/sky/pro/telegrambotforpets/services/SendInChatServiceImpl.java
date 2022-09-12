@@ -13,10 +13,15 @@ import org.springframework.stereotype.Service;
 import sky.pro.telegrambotforpets.constants.Descriptions;
 import sky.pro.telegrambotforpets.interfaces.SendInChatService;
 import sky.pro.telegrambotforpets.listener.TelegramBotUpdatesListener;
+import sky.pro.telegrambotforpets.menu.InlineKeyboard;
 import sky.pro.telegrambotforpets.model.DocumentsForPreparation;
+import sky.pro.telegrambotforpets.model.Shelter;
 import sky.pro.telegrambotforpets.repositories.DocumentsForPreparationRepository;
+import sky.pro.telegrambotforpets.repositories.ShelterRepository;
 
 import java.io.File;
+
+import static sky.pro.telegrambotforpets.constants.Constants.*;
 
 @Service
 public class SendInChatServiceImpl implements SendInChatService {
@@ -24,14 +29,118 @@ public class SendInChatServiceImpl implements SendInChatService {
     private TelegramBot telegramBot;
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private final DocumentsForPreparationRepository documentsForPreparationRepository;
+    private final ShelterRepository shelterRepository;
+    private final InlineKeyboard inlineKeyboard;
 
-    public SendInChatServiceImpl(DocumentsForPreparationRepository documentsForPreparationRepository) {
+    public SendInChatServiceImpl(DocumentsForPreparationRepository documentsForPreparationRepository, ShelterRepository shelterRepository, InlineKeyboard inlineKeyboard) {
         this.documentsForPreparationRepository = documentsForPreparationRepository;
+        this.shelterRepository = shelterRepository;
+        this.inlineKeyboard = inlineKeyboard;
     }
 
-    public void sendDoc(Long chatId, Descriptions descriptionFile) {
+
+    public String chouseMenu(String button, Long chatId, Long shelterId) {
+        logger.info("Button" + button + " Chatid" + chatId + " Shelterid" + shelterId);
+        if (shelterId == null || chatId == null) {
+            throw new NullPointerException("Такого приюта нет");
+        } else {
+            Shelter shelter = shelterRepository.findShelterById(shelterId);
+            switch (button) {
+                case MENU_1_BUTTON_1 -> {
+                    sendMsg(chatId, "Информация о приюте");
+                    sendMenu(chatId, inlineKeyboard.MenuAboutShelter(shelterId));
+                }
+                case MENU_1_1_BUTTON_1 -> {
+                    sendMsg(chatId, shelter.getDescription());
+                }
+                case MENU_1_1_BUTTON_2 -> {
+                    sendMsg(chatId, shelter.getSchedule());
+                }
+                case MENU_1_1_BUTTON_3 -> {
+                    sendMsg(chatId, shelter.getAdress());
+                    sendDoc(chatId, new File(shelter.getMapPath()));
+                }
+                case MENU_1_1_BUTTON_4 -> {
+                    sendDoc(chatId, new File(shelter.getRecomendationPath()));
+                }
+                case MENU_1_1_BUTTON_5 -> {
+                    sendMsg(chatId, shelter.getSecurityPhoneNumber());
+                }
+                case MENU_1_BUTTON_4 -> {
+                    sendMsg(chatId, "Здась будем звать волонтера");
+                }
+                case MENU_1_BUTTON_5 -> {
+                    sendMsg(chatId, "Здась будем обрабатывать контакт");
+                }
+                case MENU_1_BUTTON_2 -> {
+                    sendMsg(chatId, "Как взять питомца из приюта");
+                    sendMenu(chatId, inlineKeyboard.MenuHowGetPet(shelterId));
+                }
+                /* доработать после добавления столбца shelter_id
+                case MENU_1_2_BUTTON_1 -> {
+                    sendMsg(chatId, "Правила знакомства с питомцем");
+                    sendDocumentsForPreparation(chatId, DOG_DAITING_RULES);
+                }
+                case MENU_1_2_BUTTON_2 -> {
+                    sendMsg(chatId, "Документы необходимые, чтобы взять питомца");
+                    sendDocumentsForPreparation(chatId, LIST_DOCUMENTS_FOR_ADOPTING);
+                }
+                case MENU_1_2_BUTTON_3 -> {
+                    sendMsg(chatId, "Рекомендации по транспортировке питомца");
+                    sendDocumentsForPreparation(chatId, TRANSPORTATION_ADVICE);
+                }
+                case MENU_1_2_BUTTON_4 -> {
+                    sendMsg(chatId, "Рекомендации по обустройству дома для щенка");
+                    sendDocumentsForPreparation(chatId, PREPARING_HOUSE_FOR_A_PUPPY);
+                }
+                case MENU_1_2_BUTTON_5 -> {
+                    sendMsg(chatId, "Рекомендации по обустройству дома для взрослой собаки");
+                    sendDocumentsForPreparation(chatId, PREPARING_HOUSE_FOR_AN_ADULT_DOG);
+                }
+                case MENU_1_2_BUTTON_6 -> {
+                    sendMsg(chatId, "Рекомендации по обустройству дома для собаки с ограниченными возможностями");
+                    sendDocumentsForPreparation(chatId, PREPARING_HOUSE_FOR_A_DISABLED_DOG);
+                }
+                case MENU_1_2_BUTTON_7 -> {
+                    sendMsg(chatId, "Советы кинолога по первичному общению с питомцем");
+                    sendDocumentsForPreparation(chatId, DOGHANDLER_ADVICIES);
+                }
+                case MENU_1_2_BUTTON_8 -> {
+                    sendMsg(chatId, "Список проверенных кинологов");
+
+                }
+                case MENU_1_2_BUTTON_9 -> {
+                    sendMsg(chatId, "Причины отказа в заборе питомца");
+                    sendDocumentsForPreparation(chatId, REASONS_FOR_REFUSAL);
+                }
+
+                 */
+                default -> {
+                    //В ответ на неопознанную команду выдает меню
+                    logger.info("Неккоректная команда");
+                    sendMenu(chatId, inlineKeyboard.Menu());
+                }
+            }
+        }
+        return "Что то пошло не так";
+    }
+
+
+    public void sendDocumentsForPreparation(Long chatId, Descriptions descriptionFile) {
         DocumentsForPreparation fileDoc = documentsForPreparationRepository.findDocumentsForPreparationByDescription(descriptionFile.toString());
-        if (fileDoc != null){
+        if (fileDoc != null) {
+            File sendFile = new File(fileDoc.getFilePath());
+            sendDoc(chatId, sendFile);
+        } else {
+            sendMsg(chatId, "Документ в работе, попробуйте запросить попозже");
+            logger.info("Документ отсутсвует в БД ");
+        }
+
+    }
+
+  /*  public void sendInfoShelter(Long chatId, Descriptions descriptionFile) {
+        DocumentsForPreparation fileDoc = documentsForPreparationRepository.findDocumentsForPreparationByDescription(descriptionFile.toString());
+        if (fileDoc != null) {
             File sendFile = new File(fileDoc.getFilePath());
             SendDocument document = new SendDocument(chatId, sendFile);
             SendResponse sendResponse = telegramBot.execute(document);
@@ -47,6 +156,17 @@ public class SendInChatServiceImpl implements SendInChatService {
 
     }
 
+   */
+
+    public void sendDoc(Long chatId, File sendFile) {
+        SendDocument document = new SendDocument(chatId, sendFile);
+        SendResponse sendResponse = telegramBot.execute(document);
+        logger.info("Документ отправлен " + sendFile.getName());
+        if (!sendResponse.isOk()) {
+            int codeError = sendResponse.errorCode();
+            String description = sendResponse.description();
+        }
+    }
 
     public void sendMsg(Long chatId, String text) {
         SendMessage message = new SendMessage(chatId, text);
@@ -56,7 +176,7 @@ public class SendInChatServiceImpl implements SendInChatService {
 
     }
 
-    public void sendMenu(Long chatId, Keyboard Menu ) {
+    public void sendMenu(Long chatId, Keyboard Menu) {
         SendMessage request = new SendMessage(chatId, "Выберите пункт меню")
                 .replyMarkup(Menu)
                 .parseMode(ParseMode.HTML)
