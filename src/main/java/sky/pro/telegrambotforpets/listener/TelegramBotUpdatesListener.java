@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sky.pro.telegrambotforpets.constants.Buttons;
 import sky.pro.telegrambotforpets.interfaces.GuestService;
 import sky.pro.telegrambotforpets.interfaces.SendInChatService;
 import sky.pro.telegrambotforpets.menu.InlineKeyboard;
@@ -20,8 +21,6 @@ import sky.pro.telegrambotforpets.services.GuestServiceImpl;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-import static sky.pro.telegrambotforpets.constants.Constants.*;
-import static sky.pro.telegrambotforpets.constants.Constants.MENU_1_1_BUTTON_4;
 
 /**
  * отвечает за работу телеграм бота
@@ -80,7 +79,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                 if (update.callbackQuery().data().split("/").length > 1) {
                     String str = update.callbackQuery().data();
                     String[] part = str.split("/");
-                    String button = part[1];
+                    Buttons button = Buttons.valueOf(part[1]);
                     Long shelterId = Long.valueOf(part[0]);
                     logger.info(shelterId + " " + button);
                     switch (button) {
@@ -96,7 +95,8 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                         default -> sendInChatService.sendMsg(chatId,"Некорректная команда");
                     }
                 } else {
-                    switch (update.callbackQuery().data()) {
+
+                    switch (Buttons.valueOf(update.callbackQuery().data())) {
                         case MENU_0_BUTTON_1 -> {
                             logger.info("выбран приют для собак");
                             Shelter shelter = shelterRepository.findShelterBySpecialization("DOGS");

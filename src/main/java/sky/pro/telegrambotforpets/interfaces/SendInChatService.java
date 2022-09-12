@@ -1,6 +1,7 @@
 package sky.pro.telegrambotforpets.interfaces;
 
 import com.pengrad.telegrambot.model.request.Keyboard;
+import sky.pro.telegrambotforpets.constants.Buttons;
 import sky.pro.telegrambotforpets.constants.Descriptions;
 
 public interface SendInChatService {
@@ -24,5 +25,5 @@ public interface SendInChatService {
      */
     void sendMenu(Long chatId, Keyboard Menu);
 
-   String chouseMenu (String button, Long chatId, Long shelterId);
+   String chouseMenu (Buttons button, Long chatId, Long shelterId);
 }
