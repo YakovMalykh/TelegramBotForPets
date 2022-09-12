@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sky.pro.telegrambotforpets.constants.Buttons;
 import sky.pro.telegrambotforpets.constants.Descriptions;
 import sky.pro.telegrambotforpets.interfaces.SendInChatService;
 import sky.pro.telegrambotforpets.listener.TelegramBotUpdatesListener;
@@ -21,7 +22,6 @@ import sky.pro.telegrambotforpets.repositories.ShelterRepository;
 
 import java.io.File;
 
-import static sky.pro.telegrambotforpets.constants.Constants.*;
 
 @Service
 public class SendInChatServiceImpl implements SendInChatService {
@@ -39,7 +39,7 @@ public class SendInChatServiceImpl implements SendInChatService {
     }
 
 
-    public String chouseMenu(String button, Long chatId, Long shelterId) {
+    public String chouseMenu(Buttons button, Long chatId, Long shelterId) {
         logger.info("Button" + button + " Chatid" + chatId + " Shelterid" + shelterId);
         if (shelterId == null || chatId == null) {
             throw new NullPointerException("Такого приюта нет");
@@ -53,7 +53,7 @@ public class SendInChatServiceImpl implements SendInChatService {
                 case MENU_1_1_BUTTON_1 -> {
                     sendMsg(chatId, shelter.getDescription());
                 }
-                case MENU_1_1_BUTTON_2 -> {
+                case  MENU_1_1_BUTTON_2 -> {
                     sendMsg(chatId, shelter.getSchedule());
                 }
                 case MENU_1_1_BUTTON_3 -> {
