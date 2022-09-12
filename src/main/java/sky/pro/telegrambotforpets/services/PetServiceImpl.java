@@ -4,19 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MissingPathVariableException;
 import sky.pro.telegrambotforpets.constants.Gender;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
+import sky.pro.telegrambotforpets.interfaces.AdopterService;
 import sky.pro.telegrambotforpets.interfaces.PetService;
 import sky.pro.telegrambotforpets.interfaces.ShelterService;
-import sky.pro.telegrambotforpets.model.Cat;
-import sky.pro.telegrambotforpets.model.Dog;
-import sky.pro.telegrambotforpets.model.Pet;
-import sky.pro.telegrambotforpets.model.Shelter;
+import sky.pro.telegrambotforpets.model.*;
 import sky.pro.telegrambotforpets.repositories.CatRepository;
 import sky.pro.telegrambotforpets.repositories.DogRepository;
 
-import javax.xml.crypto.Data;
+import javax.transaction.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,17 +22,20 @@ import java.util.*;
 import static sky.pro.telegrambotforpets.constants.KindOfAnimal.*;
 
 @Service
+@Transactional
 public class PetServiceImpl implements PetService {
 
     private final Logger logger = LoggerFactory.getLogger(PetServiceImpl.class);
     private final DogRepository dogRepository;
     private final CatRepository catRepository;
     private final ShelterService shelterService;
+    private final AdopterService adopterService;
 
-    public PetServiceImpl(DogRepository dogRepository, CatRepository catRepository, ShelterService shelterService) {
+    public PetServiceImpl(DogRepository dogRepository, CatRepository catRepository, ShelterService shelterService, AdopterService adopterService) {
         this.dogRepository = dogRepository;
         this.catRepository = catRepository;
         this.shelterService = shelterService;
+        this.adopterService = adopterService;
     }
 
     /**
@@ -108,7 +108,8 @@ public class PetServiceImpl implements PetService {
                     logger.info("метод getPetByName - найдена собака - " + dog.getName());
                     return dog;
                 } catch (NoSuchElementException e) {
-                    System.out.println(e);
+                    logger.info(e.toString());
+                    logger.info("собака с таким id не найдена");
                     return null;
                 }
             }
@@ -118,7 +119,8 @@ public class PetServiceImpl implements PetService {
                     logger.info("метод getPetByName - найдена кошка - " + cat.getName());
                     return cat;
                 } catch (NoSuchElementException e) {
-                    System.out.println(e);
+                    logger.info(e.toString());
+                    logger.info("кошка с таким id не найдена");
                     return null;
                 }
             }
@@ -177,13 +179,11 @@ public class PetServiceImpl implements PetService {
     public Collection<? extends Pet> getListOfAllPets(KindOfAnimal kindOfAnimal) {
         switch (kindOfAnimal) {
             case DOGS -> {
-                // привожу к родительскому класса
                 List<Dog> dogs = dogRepository.findAll();
                 logger.info("метод getListOfAllPets - проверяется БД собак");
                 return dogs;
             }
             case CATS -> {
-                // привожу к родительскому класса
                 List<Cat> cats = catRepository.findAll();
                 logger.info("метод getListOfAllPets - проверяется БД кошек");
                 return cats;
@@ -202,7 +202,7 @@ public class PetServiceImpl implements PetService {
                 try {
                     Dog dog = dogRepository.findById(petId).get();
                     checkAndFillFields(dog, name, birthDay, gender, breedId, sterilized, invalid, shelterId);
-                    logger.info("метод editPet - поляобновлены");
+                    logger.info("метод editPet - поля обновлены");
                     return true;
                 } catch (NoSuchElementException e) {
                     logger.info(e.toString());
@@ -214,7 +214,7 @@ public class PetServiceImpl implements PetService {
                 try {
                     Cat cat = catRepository.findById(petId).get();
                     checkAndFillFields(cat, name, birthDay, gender, breedId, sterilized, invalid, shelterId);
-                    logger.info("метод editPet - поляобновлены");
+                    logger.info("метод editPet - поля обновлены");
                     return true;
                 } catch (NoSuchElementException e) {
                     logger.info(e.toString());
@@ -245,10 +245,10 @@ public class PetServiceImpl implements PetService {
         switch (valueOf(pet.getKindOfAnimal())) {
             case DOGS -> {
                 Dog dog = dogRepository.findById(pet.getId()).get();
-                if (!(name == null && name.isEmpty() && name.isBlank())) {
+                if (name != null) {
                     dog.setName(name);
                 }
-                if (!(birthDay == null && name.isEmpty() && name.isBlank())) {
+                if (birthDay != null) {
                     LocalDate parseDate = LocalDate.parse(birthDay, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
                     dog.setBirthday(parseDate);
                 }
@@ -296,9 +296,39 @@ public class PetServiceImpl implements PetService {
         }
     }
 
+    /**
+     * вносит усыновителя живтоного в БД.
+     *
+     * @param kindOfAnimal
+     * @param petId
+     * @param adopterId
+     * @return
+     * @see AdopterService#getAdopterById
+     */
     @Override
     public boolean appointAdopter(KindOfAnimal kindOfAnimal, Long petId, Long adopterId) {
-        // нужно инжектить сервис усыновителей, и использовать его метод getAdopterById
+        Adopter adopter = adopterService.getAdopterById(adopterId, kindOfAnimal);
+        Pet pet = getPetById(petId, kindOfAnimal);
+
+        if (adopter != null && pet != null) {
+            switch (kindOfAnimal) {
+                case DOGS -> {
+                    Dog dog = (Dog) pet;
+                    dog.setDogAdopter((DogAdopter) adopter);
+                    logger.info("метод appointAdopter - собаке " + dog.getName() + " установлен усыновитель "
+                            + adopter.getName());
+                    return true;
+                }
+                case CATS -> {
+                    Cat cat = (Cat) pet;
+                    cat.setCatAdopter((CatAdopter) adopter);
+                    logger.info("метод appointAdopter - собаке " + cat.getName() + " установлен усыновитель "
+                            + adopter.getName());
+                    return true;
+                }
+            }
+        }
+        logger.info("метод appointAdopter - усыновителя или питомца с такими Id не существует в БД");
         return false;
     }
 
@@ -312,14 +342,18 @@ public class PetServiceImpl implements PetService {
      * @see CatRepository#deleteById
      */
     @Override
+    @Transactional
     public boolean removePet(KindOfAnimal kindOfAnimal, Long petId) {
         switch (kindOfAnimal) {
             case DOGS -> {
                 try {
-                    dogRepository.deleteById(petId);
+                    Dog dog = dogRepository.findById(petId).get();//сначала получаю питомца по id,
+                    // а потом удалаю, т.к. выскакивают UnexpectedRollbackException и EmptyResultDataAccessException,
+                    // при том что обрабатывал их в блоке catch, что-то с Transactional, но пока не разобрался
+                    dogRepository.delete(dog);
                     logger.info("метод removePet - собака с id: " + petId + " удалена");
                     return true;
-                } catch (EmptyResultDataAccessException e) {
+                } catch (NoSuchElementException e) {
                     logger.info("метод removePet - собаки с id: " + petId + " в БД нет");
                     System.out.println(e);
                     return false;
@@ -327,7 +361,10 @@ public class PetServiceImpl implements PetService {
             }
             case CATS -> {
                 try {
-                    catRepository.deleteById(petId);
+                    Cat cat = catRepository.findById(petId).get();//сначала получаю питомца по id,
+                    // а потом удалаю, т.к. выскакивают UnexpectedRollbackException и EmptyResultDataAccessException,
+                    // при том что обрабатывал их в блоке catch, что-то с Transactional, но пока не разобрался
+                    catRepository.delete(cat);
                     logger.info("метод removePet - кошка с id: " + petId + " удалена");
                     return true;
                 } catch (EmptyResultDataAccessException e) {
