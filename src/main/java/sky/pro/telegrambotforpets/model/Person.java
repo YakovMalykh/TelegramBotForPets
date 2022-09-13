@@ -39,7 +39,7 @@ public abstract class Person {
         this.lastName = lastName;
         this.gender = gender;
         this.birthday = birthday;
-        this.phoneNumber = phoneNumber;
+        setPhoneNumber(phoneNumber);
         this.address = address;
     }
 
@@ -141,12 +141,12 @@ public abstract class Person {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return id.equals(person.id) && name.equals(person.name) && Objects.equals(middleName, person.middleName) && lastName.equals(person.lastName) && Objects.equals(gender, person.gender) && Objects.equals(birthday, person.birthday) && phoneNumber.equals(person.phoneNumber) && address.equals(person.address);
+        return name.equals(person.name) && middleName.equals(person.middleName) && lastName.equals(person.lastName) && gender.equals(person.gender) && birthday.equals(person.birthday) && phoneNumber.equals(person.phoneNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, middleName, lastName, gender, birthday, phoneNumber, address);
+        return Objects.hash(name, middleName, lastName, gender, birthday, phoneNumber);
     }
 
     @Override

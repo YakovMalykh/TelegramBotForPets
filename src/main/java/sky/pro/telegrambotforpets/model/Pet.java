@@ -108,12 +108,12 @@ public abstract class Pet {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Pet pet = (Pet) o;
-        return id.equals(pet.id) && name.equals(pet.name) && Objects.equals(birthday, pet.birthday) && gender.equals(pet.gender) && breedId.equals(pet.breedId) && kindOfAnimal.equals(pet.kindOfAnimal);
+        return name.equals(pet.name) && birthday.equals(pet.birthday) && gender.equals(pet.gender) && breedId.equals(pet.breedId) && kindOfAnimal.equals(pet.kindOfAnimal);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, birthday, gender, breedId, kindOfAnimal);
+        return Objects.hash(name, birthday, gender, breedId, kindOfAnimal);
     }
 
     @Override

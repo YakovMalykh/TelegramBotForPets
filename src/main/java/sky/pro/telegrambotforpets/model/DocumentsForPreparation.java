@@ -30,6 +30,17 @@ public class DocumentsForPreparation {
     @Column(name = "documents_for_preparation_file_size")
     private Long fileSize;
 
+    @Column(name = "documents_for_preparation_kind_of_animal")
+    private String kindOfAnimal;
+
+    public String getKindOfAnimal() {
+        return kindOfAnimal;
+    }
+
+    public void setKindOfAnimal(String kindOfAnimal) {
+        this.kindOfAnimal = kindOfAnimal;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -86,7 +97,8 @@ public class DocumentsForPreparation {
                 ", description='" + description + '\'' +
                 ", filePath='" + filePath + '\'' +
                 ", mediaType='" + mediaType + '\'' +
-                ", fileSize=" + fileSize +
+                ", fileSize=" + fileSize +'\'' +
+                ", kindOfAnimal=" + kindOfAnimal +
                 '}';
     }
 }
