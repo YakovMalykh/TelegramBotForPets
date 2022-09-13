@@ -31,7 +31,9 @@ public class ShelterController {
     }
 
     @Operation(
-            summary = "заносит новый приют в БД и сохраняет файлы в папку",
+            summary = "заносит новый приют в БД и сохраняет файлы в папку. В команде условились, что пока " +
+                    "можно занести в Бд только 2 приюта(один для кошек, второй для собак, иначе нужно пересматривать " +
+                    "логику обработки в телеграм-боте и в ShelterRepository.findShelterBySpecialization(String specialiZation)",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
