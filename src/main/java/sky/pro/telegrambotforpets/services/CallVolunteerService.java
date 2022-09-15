@@ -1,7 +1,6 @@
 package sky.pro.telegrambotforpets.services;
 
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.ChatInviteLink;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.CreateChatInviteLink;
@@ -11,14 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import sky.pro.telegrambotforpets.model.Guest;
+import sky.pro.telegrambotforpets.model.Volunteer;
 import sky.pro.telegrambotforpets.repositories.GuestRepository;
 import sky.pro.telegrambotforpets.repositories.VolunteerRepository;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -27,6 +25,9 @@ public class CallVolunteerService {
     private final VolunteerRepository volunteerRepository;
     private final GuestRepository guestRepository;
     private final TelegramBot bot;
+
+    private int countGCh = 0;
+    private Long countV = 1L;
 
     public CallVolunteerService(VolunteerRepository volunteerRepository, GuestRepository guestRepository, TelegramBot bot) {
         this.volunteerRepository = volunteerRepository;
@@ -38,7 +39,7 @@ public class CallVolunteerService {
 //        SendMessage callsVolunteer = new SendMessage("-1001534654244", "User calls volunteer ");
 //        bot.execute(callsVolunteer);
         //здесь вставляю пока руками chatId групповго чата они начинаются со -100 или -...
-        CreateChatInviteLink chatInviteLink = new CreateChatInviteLink("-1001534654244");
+        CreateChatInviteLink chatInviteLink = new CreateChatInviteLink(chooseGroupChat());
         Long expireDate = Instant.now().getEpochSecond() + 3600;//получаю время данного момента в Unix формате
         // и прибавляю один час - это время существования ссылки
         CreateChatInviteLink createChatInviteLink = chatInviteLink.name("chat with volunteer")
@@ -54,23 +55,41 @@ public class CallVolunteerService {
         // и не состоять в этом чата до этого
 
         // отправляю ссылку в чат гостя позвавшего волонтера
+        bot.execute(new SendMessage(chatId, "для беседы с волонтером перейдите по ссылке"));
         bot.execute(new SendMessage(chatId, inviteLink1));
         // отправляю ту же ссылку волонтеру
-        bot.execute(new SendMessage(getVolonteer(),inviteLink1));
+        bot.execute(new SendMessage(getVolonteer(), "для беседы с гостем перейдите по ссылке"));
+        bot.execute(new SendMessage(getVolonteer(), inviteLink1));
 
     }
 
-    private String findEmptyGroupChat() {
+    private String chooseGroupChat() {
         //здесь хочу в базе госетей найти все групповые чаты и выбрать какой-нибудь из них
         List<Long> allGroupChats = guestRepository.findAll().stream().filter(
                         e -> e.getChatId().toString().startsWith("-"))
                 .toList()
                 .stream().map(Guest::getChatId).toList();
-        return null;
+
+        String groupChatIdString = allGroupChats.get(countGCh).toString();
+        countGCh++;
+        if (countGCh == allGroupChats.size()) {
+            countGCh = 0;
+        }
+        return groupChatIdString;
     }
+
     private String getVolonteer() {
         //здесь хочу реализовать рандомный(или как-то по порядку) выбор волонтера из списка
-       return volunteerRepository.findById(1L).get().getVolunteerChatId().toString();
+//        volunteerRepository.findById(1L).get().getVolunteerChatId().toString();
+        List<Volunteer> all = volunteerRepository.findAll();
+
+        String volunteerChatIdString = volunteerRepository.findById(countV).get().getVolunteerChatId().toString();
+
+        countV++;
+        if (countV == all.size()) {
+            countV = 1L;
+        }
+        return volunteerChatIdString;
     }
 
 }

@@ -98,8 +98,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                                 sendInChatService.chouseMenu(button, chatId, shelterId);
                             }
                             case MENU_1_BUTTON_4 -> {
-                                SendMessage sendMessage = new SendMessage(chatId, "для беседы с волонтером перейдите по ссылке");
-                                telegramBot.execute(sendMessage);
                                 callVolunteerService.callVolunteer(chatId, update);
                             }
 /*доработать после того как в таблицу document_for_preparation будет добавлен столбец с приютом

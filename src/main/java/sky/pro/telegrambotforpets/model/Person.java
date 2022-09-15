@@ -119,6 +119,7 @@ public abstract class Person {
 
             this.phoneNumber = phoneNumber
                     .replace("+7", "8")
+                    .replace("7","8")
                     .replace(" ", "")
                     .replace("-", "")
                     .replace("(", "")
