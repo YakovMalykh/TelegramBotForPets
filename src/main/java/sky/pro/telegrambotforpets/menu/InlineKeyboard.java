@@ -9,6 +9,7 @@ import sky.pro.telegrambotforpets.constants.Buttons;
 
 @Service
 public class InlineKeyboard extends Keyboard {
+
     public Keyboard Menu() {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton(Buttons.MENU_0_BUTTON_1.getButtonName()).callbackData(Buttons.MENU_0_BUTTON_1.name()), new InlineKeyboardButton(Buttons.MENU_0_BUTTON_2.getButtonName()).callbackData(Buttons.MENU_0_BUTTON_2.name()));
@@ -27,8 +28,10 @@ public class InlineKeyboard extends Keyboard {
 */
     public Keyboard MenuCommon(Long shelterId) {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
-                new InlineKeyboardButton(Buttons.MENU_1_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_1), new InlineKeyboardButton(Buttons.MENU_1_BUTTON_2.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_2))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_BUTTON_3.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_3), new InlineKeyboardButton(Buttons.MENU_1_BUTTON_4.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_4));
+                new InlineKeyboardButton(Buttons.MENU_1_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_1),
+                new InlineKeyboardButton(Buttons.MENU_1_BUTTON_2.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_2))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_BUTTON_3.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_3),
+                        new InlineKeyboardButton(Buttons.MENU_1_BUTTON_4.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_4));
         return replyKeyboardMarkup;
     }
 

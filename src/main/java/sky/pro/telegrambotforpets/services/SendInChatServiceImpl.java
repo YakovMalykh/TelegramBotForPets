@@ -66,9 +66,9 @@ public class SendInChatServiceImpl implements SendInChatService {
                 case MENU_1_1_BUTTON_5 -> {
                     sendMsg(chatId, shelter.getSecurityPhoneNumber());
                 }
-                case MENU_1_BUTTON_4 -> {
-                    sendMsg(chatId, "Здась будем звать волонтера");
-                }
+//                case MENU_1_BUTTON_4 -> {
+//                    sendMsg(chatId, "Здась будем звать волонтера");
+//                }
                 case MENU_1_BUTTON_5 -> {
                     sendMsg(chatId, "Здась будем обрабатывать контакт");
                 }
