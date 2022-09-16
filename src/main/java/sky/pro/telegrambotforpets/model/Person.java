@@ -116,14 +116,19 @@ public abstract class Person {
      */
     public void setPhoneNumber(String phoneNumber) {
         if (phoneNumber != null && !(phoneNumber.isBlank() && phoneNumber.isEmpty())) {
-
             this.phoneNumber = phoneNumber
                     .replace("+7", "8")
-                    .replace("7","8")
                     .replace(" ", "")
                     .replace("-", "")
                     .replace("(", "")
                     .replace(")", "");
+
+            if (phoneNumber.startsWith("7")) {
+                char[] chars = phoneNumber.toCharArray();
+                chars[0] = '8';
+                String newPhoneNumber = String.valueOf(chars);
+                this.phoneNumber = newPhoneNumber;
+            }
         } else {
             throw new IllegalArgumentException("введены некорректные данные");
         }

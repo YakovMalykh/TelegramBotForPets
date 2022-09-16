@@ -16,5 +16,5 @@ public interface GuestService {
      * @return true если гость с таким Id уже существует
      * @see JpaRepository#findAll()
      */
-    public boolean doesGuestAlreadyExistsInDB(Update update);
+    boolean doesGuestAlreadyExistsInDB(Update update);
 }

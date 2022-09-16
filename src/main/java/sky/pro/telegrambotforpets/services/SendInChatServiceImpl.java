@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sky.pro.telegrambotforpets.constants.Buttons;
 import sky.pro.telegrambotforpets.constants.Descriptions;
+import sky.pro.telegrambotforpets.interfaces.AdopterService;
+import sky.pro.telegrambotforpets.interfaces.GuestService;
 import sky.pro.telegrambotforpets.interfaces.SendInChatService;
 import sky.pro.telegrambotforpets.listener.TelegramBotUpdatesListener;
 import sky.pro.telegrambotforpets.menu.InlineKeyboard;
@@ -32,10 +34,13 @@ public class SendInChatServiceImpl implements SendInChatService {
     private final ShelterRepository shelterRepository;
     private final InlineKeyboard inlineKeyboard;
 
-    public SendInChatServiceImpl(DocumentsForPreparationRepository documentsForPreparationRepository, ShelterRepository shelterRepository, InlineKeyboard inlineKeyboard) {
+    private final AdopterService adopterService;
+
+    public SendInChatServiceImpl(DocumentsForPreparationRepository documentsForPreparationRepository, ShelterRepository shelterRepository, InlineKeyboard inlineKeyboard, AdopterService adopterService) {
         this.documentsForPreparationRepository = documentsForPreparationRepository;
         this.shelterRepository = shelterRepository;
         this.inlineKeyboard = inlineKeyboard;
+        this.adopterService = adopterService;
     }
 
 
@@ -53,7 +58,7 @@ public class SendInChatServiceImpl implements SendInChatService {
                 case MENU_1_1_BUTTON_1 -> {
                     sendMsg(chatId, shelter.getDescription());
                 }
-                case  MENU_1_1_BUTTON_2 -> {
+                case MENU_1_1_BUTTON_2 -> {
                     sendMsg(chatId, shelter.getSchedule());
                 }
                 case MENU_1_1_BUTTON_3 -> {
@@ -177,7 +182,8 @@ public class SendInChatServiceImpl implements SendInChatService {
     }
 
     public void sendMenu(Long chatId, Keyboard Menu) {
-        SendMessage request = new SendMessage(chatId, "Выберите пункт меню")
+        String nameOfPerson = adopterService.greeting(chatId);
+        SendMessage request = new SendMessage(chatId, nameOfPerson + ", выберите пункт меню")
                 .replyMarkup(Menu)
                 .parseMode(ParseMode.HTML)
                 .disableWebPagePreview(true);

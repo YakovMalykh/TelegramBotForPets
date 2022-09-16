@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface CatAdopterRepository extends JpaRepository<CatAdopter,Long> {
 
     Optional<CatAdopter> findByPhoneNumber (String phoneNumber);
+
+    Optional<CatAdopter> findByChatId(Long chatId);
 }
