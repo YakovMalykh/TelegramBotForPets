@@ -22,4 +22,11 @@ public interface AdopterService {
     Collection<? extends Adopter> getListAdopters(KindOfAnimal kindOfAnimal);
 
     boolean removeAdopter(KindOfAnimal kindOfAnimal, Long adopterId);
+    /**
+     * ищет по chatId в БД усыновителей и достает имя, если усыновителя с таким chatId нет, то идет в БД
+     * гостей и достает гостя с таким chatId и возвращает имя
+     * @param chatId
+     * @return
+     */
+    String greeting(Long chatId);
 }

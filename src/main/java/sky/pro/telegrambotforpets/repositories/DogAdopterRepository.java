@@ -5,7 +5,9 @@ import sky.pro.telegrambotforpets.model.DogAdopter;
 
 import java.util.Optional;
 
-public interface DogAdopterRepository extends JpaRepository<DogAdopter,Long> {
+public interface DogAdopterRepository extends JpaRepository<DogAdopter, Long> {
 
-    Optional<DogAdopter> findByPhoneNumber (String phoneNumber);
+    Optional<DogAdopter> findByPhoneNumber(String phoneNumber);
+
+    Optional<DogAdopter> findByChatId(long chatId);
 }

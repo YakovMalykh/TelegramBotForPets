@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.xml.transform.sax.SAXResult;
 import java.util.Objects;
 
 /**
@@ -45,11 +46,17 @@ public class Guest {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber
                 .replace("+7", "8")
-                .replace("7","8")
                 .replace(" ", "")
                 .replace("-", "")
                 .replace("(", "")
                 .replace(")", "");
+
+        if (phoneNumber.startsWith("7")) {
+            char[] chars = phoneNumber.toCharArray();
+            chars[0] = '8';
+            String newPhoneNumber = String.valueOf(chars);
+            this.phoneNumber = newPhoneNumber;
+        }
     }
 
     @Override
