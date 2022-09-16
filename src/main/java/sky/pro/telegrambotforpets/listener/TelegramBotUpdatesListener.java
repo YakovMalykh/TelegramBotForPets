@@ -70,6 +70,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
                 if (update.message().text() != null) {
                     if (!guestService.doesGuestAlreadyExistsInDB(update)) {
+                        telegramBot.execute(guestService.firstMeeting(update));
                         guestService.saveGuestToDB(update);
                     }
                     logger.info("update " + update.message().text());
