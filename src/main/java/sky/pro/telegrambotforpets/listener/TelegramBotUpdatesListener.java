@@ -64,78 +64,76 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     @Override
     public int process(List<Update> updates) {
         updates.forEach(update -> {
-            //добавил эту проверку, чтобы бот не реагировал на сообщения в групповых чатах волонтеров
-//            if(!update.message().chat().id().toString().equals("-1001534654244")){
+            //добавил здесь проверку, чтобы бот не реагировал на сообщения в групповых чатах волонтеров
+            if (update.message() != null && !callVolunteerService.isItGroupChatToTalkWithVolunteer(update)) {
 
-                if (update.message() != null) {
-                    if (update.message().text() != null) {
-                        if (!guestService.doesGuestAlreadyExistsInDB(update)) {
-                            guestService.saveGuestToDB(update);
-                        }
-                        logger.info("update " + update.message().text());
-                        sendInChatService.sendMenu(update.message().chat().id(), inlineKeyboard.Menu());
+
+                if (update.message().text() != null) {
+                    if (!guestService.doesGuestAlreadyExistsInDB(update)) {
+                        guestService.saveGuestToDB(update);
                     }
-                    if (!(update.message().contact() == null)) {
-                        Guest guest = new Guest();
-                        guest.setUserName(update.message().contact().firstName());
-                        guest.setChatId(update.message().contact().userId());
-                        guest.setPhoneNumber(update.message().contact().phoneNumber());
-                        guestRepository.save(guest);
-                        logger.info("Данные о госте занесены в БД");
-                    }
-                } else if (update.callbackQuery() != null) {
-                    Long chatId = update.callbackQuery().message().chat().id();
-                    if (update.callbackQuery().data().split("/").length > 1) {
-                        String str = update.callbackQuery().data();
-                        String[] part = str.split("/");
-                        Buttons button = Buttons.valueOf(part[1]);
-                        Long shelterId = Long.valueOf(part[0]);
-                        logger.info(shelterId + " " + button);
-                        switch (button) {
-                            case MENU_1_BUTTON_1, MENU_1_BUTTON_2, MENU_1_BUTTON_3,
+                    logger.info("update " + update.message().text());
+                    sendInChatService.sendMenu(update.message().chat().id(), inlineKeyboard.Menu());
+                }
+                if (!(update.message().contact() == null)) {
+                    Guest guest = new Guest();
+                    guest.setUserName(update.message().contact().firstName());
+                    guest.setChatId(update.message().contact().userId());
+                    guest.setPhoneNumber(update.message().contact().phoneNumber());
+                    guestRepository.save(guest);
+                    logger.info("Данные о госте занесены в БД");
+                }
+            } else if (update.callbackQuery() != null) {
+                Long chatId = update.callbackQuery().message().chat().id();
+                if (update.callbackQuery().data().split("/").length > 1) {
+                    String str = update.callbackQuery().data();
+                    String[] part = str.split("/");
+                    Buttons button = Buttons.valueOf(part[1]);
+                    Long shelterId = Long.valueOf(part[0]);
+                    logger.info(shelterId + " " + button);
+                    switch (button) {
+                        case MENU_1_BUTTON_1, MENU_1_BUTTON_2, MENU_1_BUTTON_3,
 //                                MENU_1_BUTTON_4,
-                                    MENU_1_1_BUTTON_1, MENU_1_1_BUTTON_2, MENU_1_1_BUTTON_3, MENU_1_1_BUTTON_4, MENU_1_1_BUTTON_5 -> {
-                                sendInChatService.chouseMenu(button, chatId, shelterId);
-                            }
-                            case MENU_1_BUTTON_4 -> {
-                                callVolunteerService.callVolunteer(chatId, update);
-                            }
+                                MENU_1_1_BUTTON_1, MENU_1_1_BUTTON_2, MENU_1_1_BUTTON_3, MENU_1_1_BUTTON_4, MENU_1_1_BUTTON_5 -> {
+                            sendInChatService.chouseMenu(button, chatId, shelterId);
+                        }
+                        case MENU_1_BUTTON_4 -> callVolunteerService.callVolunteer(chatId);
+
 /*доработать после того как в таблицу document_for_preparation будет добавлен столбец с приютом
                         case MENU_1_2_BUTTON_1, MENU_1_2_BUTTON_2, MENU_1_2_BUTTON_3, MENU_1_2_BUTTON_4, MENU_1_2_BUTTON_5, MENU_1_2_BUTTON_6, MENU_1_2_BUTTON_7, MENU_1_2_BUTTON_8, MENU_1_2_BUTTON_9 -> {
                             sendInChatService.chouseMenu(button, chatId, shelterId);
                         }
 
  */
-                            default -> sendInChatService.sendMsg(chatId, "Некорректная команда");
-                        }
+                        default -> sendInChatService.sendMsg(chatId, "Некорректная команда");
+                    }
 
-                    } else {
+                } else {
 
-                        switch (Buttons.valueOf(update.callbackQuery().data())) {
-                            case MENU_0_BUTTON_1 -> {
-                                logger.info("выбран приют для собак");
-                                Shelter shelter = shelterRepository.findShelterBySpecialization("DOGS");
-                                if (shelter != null) {
-                                    sendInChatService.sendMenu(chatId, inlineKeyboard.MenuCommon(shelter.getId()));
-                                } else {
-                                    sendInChatService.sendMsg(chatId, "Такого приюта еще нет в базе данных, попробуйте выбрать другой");
-                                    sendInChatService.sendMenu(chatId, inlineKeyboard.Menu());
-                                }
+                    switch (Buttons.valueOf(update.callbackQuery().data())) {
+                        case MENU_0_BUTTON_1 -> {
+                            logger.info("выбран приют для собак");
+                            Shelter shelter = shelterRepository.findShelterBySpecialization("DOGS");
+                            if (shelter != null) {
+                                sendInChatService.sendMenu(chatId, inlineKeyboard.MenuCommon(shelter.getId()));
+                            } else {
+                                sendInChatService.sendMsg(chatId, "Такого приюта еще нет в базе данных, попробуйте выбрать другой");
+                                sendInChatService.sendMenu(chatId, inlineKeyboard.Menu());
                             }
-                            case MENU_0_BUTTON_2 -> {
-                                logger.info("выбран приют для кошек");
-                                Shelter shelter = shelterRepository.findShelterBySpecialization("CATS");
-                                if (shelter != null) {
-                                    sendInChatService.sendMenu(chatId, inlineKeyboard.MenuCommon(shelter.getId()));
-                                } else {
-                                    sendInChatService.sendMsg(chatId, "Такого приюта еще нет в базе данных, попробуйте выбрать другой");
-                                    sendInChatService.sendMenu(chatId, inlineKeyboard.Menu());
-                                }
+                        }
+                        case MENU_0_BUTTON_2 -> {
+                            logger.info("выбран приют для кошек");
+                            Shelter shelter = shelterRepository.findShelterBySpecialization("CATS");
+                            if (shelter != null) {
+                                sendInChatService.sendMenu(chatId, inlineKeyboard.MenuCommon(shelter.getId()));
+                            } else {
+                                sendInChatService.sendMsg(chatId, "Такого приюта еще нет в базе данных, попробуйте выбрать другой");
+                                sendInChatService.sendMenu(chatId, inlineKeyboard.Menu());
                             }
                         }
                     }
                 }
-//            }
+            }
 
         });
         logger.info("апдейт конфирм");

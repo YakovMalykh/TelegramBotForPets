@@ -27,7 +27,7 @@ public class CallVolunteerService {
     private final TelegramBot bot;
 
     private int countGCh = 0;
-    private Long countV = 1L;
+    private int countV = 0;
 
     public CallVolunteerService(VolunteerRepository volunteerRepository, GuestRepository guestRepository, TelegramBot bot) {
         this.volunteerRepository = volunteerRepository;
@@ -35,10 +35,15 @@ public class CallVolunteerService {
         this.bot = bot;
     }
 
-    public void callVolunteer(Long chatId, Update update) {
-//        SendMessage callsVolunteer = new SendMessage("-1001534654244", "User calls volunteer ");
-//        bot.execute(callsVolunteer);
-        //здесь вставляю пока руками chatId групповго чата они начинаются со -100 или -...
+    /**
+     * метод условно рандомно выбирает групповой чат и волонтера, формирует пригласительную ссылку на этот чат
+     * и отправляет ее и волонтеру и гостю, переходя по этой ссылке они попадают в один групповой чат
+     * и продолжают беседу в нем.
+     *
+     * @param chatId гостя
+     * @see CallVolunteerService#isItGroupChatToTalkWithVolunteer
+     */
+    public void callVolunteer(Long chatId) {
         CreateChatInviteLink chatInviteLink = new CreateChatInviteLink(chooseGroupChat());
         Long expireDate = Instant.now().getEpochSecond() + 3600;//получаю время данного момента в Unix формате
         // и прибавляю один час - это время существования ссылки
@@ -50,19 +55,25 @@ public class CallVolunteerService {
         //достаю из ответа ссылку ввиде строки
         String inviteLink1 = link.inviteLink();
 
-        // идея в том чтобы иметь несколько предсозданных групповых чатов, в которых состоит один бот и
-        // какой-ниб администратор. И мы в один из них приглашаем и гостя и волонтера. Т.е волонтер может
-        // и не состоять в этом чата до этого
+        // идея в том чтобы иметь несколько предсозданных групповых чатов, в которых состоит бот в
+        // качестве администратора. И мы в один из них приглашаем и гостя и волонтера.
 
         // отправляю ссылку в чат гостя позвавшего волонтера
-        bot.execute(new SendMessage(chatId, "для беседы с волонтером перейдите по ссылке"));
-        bot.execute(new SendMessage(chatId, inviteLink1));
+        bot.execute(new SendMessage(chatId, "для беседы с волонтером перейдите по ссылке \n"
+                + inviteLink1));
         // отправляю ту же ссылку волонтеру
-        bot.execute(new SendMessage(getVolonteer(), "для беседы с гостем перейдите по ссылке"));
-        bot.execute(new SendMessage(getVolonteer(), inviteLink1));
+        bot.execute(new SendMessage(getVolonteer(), "для беседы с гостем перейдите по ссылке \n"
+                + inviteLink1));
 
     }
 
+    /**
+     * т.к. групповые чаты начианются с "-", а любой чат ботом сохраняется как "Гость",
+     * мы находим в БД гостей все имеющиеся чаты начинающиеся с "-" и по очереди обращаемся к каждому из них
+     * при новом вызове метода
+     *
+     * @return строку с chatId группового чата
+     */
     private String chooseGroupChat() {
         //здесь хочу в базе госетей найти все групповые чаты и выбрать какой-нибудь из них
         List<Long> allGroupChats = guestRepository.findAll().stream().filter(
@@ -78,18 +89,34 @@ public class CallVolunteerService {
         return groupChatIdString;
     }
 
+    /**
+     * метод по очереди берет волонтеров из БД волонтеров
+     *
+     * @return строку с chatId волонтера
+     */
     private String getVolonteer() {
         //здесь хочу реализовать рандомный(или как-то по порядку) выбор волонтера из списка
 //        volunteerRepository.findById(1L).get().getVolunteerChatId().toString();
-        List<Volunteer> all = volunteerRepository.findAll();
+        List<Long> all = volunteerRepository.findAll().stream()
+                .map(Volunteer::getVolunteerChatId).sorted().toList();
 
-        String volunteerChatIdString = volunteerRepository.findById(countV).get().getVolunteerChatId().toString();
+        String volunteerChatIdString = all.get(countV).toString();
 
         countV++;
         if (countV == all.size()) {
-            countV = 1L;
+            countV = 0;
         }
         return volunteerChatIdString;
     }
 
+    /**
+     * проверяет по chatId является ли этот чат групповым, если это групповой чат, то бот должен игнорировать
+     * все сообщения которые в нем отправляются
+     *
+     * @param update
+     * @return true если это групповой чат для разговора с волонтером
+     */
+    public boolean isItGroupChatToTalkWithVolunteer(Update update) {
+        return update.message().chat().id().toString().startsWith("-");
+    }
 }
