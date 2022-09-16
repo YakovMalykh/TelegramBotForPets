@@ -1,6 +1,7 @@
 package sky.pro.telegrambotforpets.interfaces;
 
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GuestService {
@@ -17,4 +18,6 @@ public interface GuestService {
      * @see JpaRepository#findAll()
      */
     boolean doesGuestAlreadyExistsInDB(Update update);
+
+    SendMessage firstMeeting(Update update);
 }
