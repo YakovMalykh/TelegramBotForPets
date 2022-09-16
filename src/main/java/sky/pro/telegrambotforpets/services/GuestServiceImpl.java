@@ -68,5 +68,4 @@ public class GuestServiceImpl implements GuestService {
         return guestRepository.findById(chatId).isPresent();
     }
 
-
 }
