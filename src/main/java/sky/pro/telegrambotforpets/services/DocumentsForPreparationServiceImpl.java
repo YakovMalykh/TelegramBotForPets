@@ -49,6 +49,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
     public boolean saveDocumentToDB(String description, MultipartFile file, String kindOfAnimal) throws IOException {
         DocumentsForPreparation docExists =
                 documentsForPreparationRepository.findDocumentsForPreparationByDescriptionAndKindOfAnimal (description, kindOfAnimal);
+        
 
         if (docExists == null) {
 

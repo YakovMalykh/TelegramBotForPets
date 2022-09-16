@@ -45,6 +45,7 @@ public class Guest {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber
                 .replace("+7", "8")
+                .replace("7","8")
                 .replace(" ", "")
                 .replace("-", "")
                 .replace("(", "")
