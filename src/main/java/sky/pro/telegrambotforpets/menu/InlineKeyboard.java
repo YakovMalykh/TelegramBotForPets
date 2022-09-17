@@ -1,10 +1,10 @@
 package sky.pro.telegrambotforpets.menu;
 
-import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
-import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.model.request.Keyboard;
+import com.pengrad.telegrambot.model.request.*;
 import org.springframework.stereotype.Service;
 import sky.pro.telegrambotforpets.constants.Buttons;
+import sky.pro.telegrambotforpets.constants.KindOfAnimal;
+import sky.pro.telegrambotforpets.model.Shelter;
 
 
 @Service
@@ -19,13 +19,12 @@ public class InlineKeyboard extends Keyboard {
 
     public Keyboard MenuTest() {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
-                new InlineKeyboardButton("Тест").callbackData("Тест12"));
-
+                new InlineKeyboardButton("fgrthjty").switchInlineQueryCurrentChat("dfbfgb"));
         return replyKeyboardMarkup;
     }
 
-  /*  переделать кнопки из-за ограничения на количество символов в каллбекдата
-*/
+    /*  переделать кнопки из-за ограничения на количество символов в каллбекдата
+     */
     public Keyboard MenuCommon(Long shelterId) {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton(Buttons.MENU_1_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_1),
@@ -40,21 +39,33 @@ public class InlineKeyboard extends Keyboard {
                 new InlineKeyboardButton(Buttons.MENU_1_1_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_1_BUTTON_1), new InlineKeyboardButton(Buttons.MENU_1_1_BUTTON_2.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_1_BUTTON_2))
                 .addRow(new InlineKeyboardButton(Buttons.MENU_1_1_BUTTON_3.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_1_BUTTON_3))
                 .addRow(new InlineKeyboardButton(Buttons.MENU_1_1_BUTTON_4.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_1_BUTTON_4))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_1_BUTTON_5.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_1_BUTTON_5))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_BUTTON_5.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_5),new InlineKeyboardButton(Buttons.MENU_1_BUTTON_4.getButtonName()).callbackData(String.valueOf(Buttons.MENU_1_BUTTON_4)));
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_1_BUTTON_5.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_1_BUTTON_5));
         return replyKeyboardMarkup;
     }
 
-    public Keyboard MenuHowGetPet(Long shelterId) {
-        Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_1))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_2.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_2))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_3.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_3))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_4.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_4))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_5.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_5))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_6.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_6))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_7.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_7))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_8.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_8))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_9.getButtonName()).callbackData(shelterId.toString() + "/" +Buttons.MENU_1_2_BUTTON_9));
-                 return replyKeyboardMarkup;
+    public Keyboard MenuContact() {
+        Keyboard replyKeyboardMarkup = new ReplyKeyboardMarkup(
+                new KeyboardButton(Buttons.MENU_1_BUTTON_5.name()).requestContact(true))
+                .oneTimeKeyboard(true)
+                .resizeKeyboard(true)
+                .selective(true);
+        return replyKeyboardMarkup;
+    }
+
+    public Keyboard MenuHowGetPet(Shelter shelter) {
+        Long shelterId = shelter.getId();
+        InlineKeyboardMarkup replyKeyboardMarkup = new InlineKeyboardMarkup(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_1))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_2.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_2))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_3.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_3))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_4.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_4))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_5.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_5))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_6.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_6));
+        if (shelter.getSpecialization().equals(KindOfAnimal.DOGS.name())) {
+            replyKeyboardMarkup.addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_7.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_7))
+                    .addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_8.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_8));
+        }
+        replyKeyboardMarkup.addRow(new InlineKeyboardButton(Buttons.MENU_1_2_BUTTON_9.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_2_BUTTON_9));
+        Keyboard inlineKeyboardMarkup = replyKeyboardMarkup;
+        return replyKeyboardMarkup;
     }
 }

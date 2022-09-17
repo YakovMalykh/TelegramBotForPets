@@ -3,7 +3,6 @@ package sky.pro.telegrambotforpets.listener;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.SendMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import sky.pro.telegrambotforpets.interfaces.SendInChatService;
 import sky.pro.telegrambotforpets.menu.InlineKeyboard;
 import sky.pro.telegrambotforpets.model.Guest;
 import sky.pro.telegrambotforpets.model.Shelter;
-import sky.pro.telegrambotforpets.repositories.DocumentsForPreparationRepository;
 import sky.pro.telegrambotforpets.repositories.GuestRepository;
 import sky.pro.telegrambotforpets.repositories.ShelterRepository;
 import sky.pro.telegrambotforpets.services.CallVolunteerService;
@@ -43,11 +41,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     private final CallVolunteerService callVolunteerService;
 
     public TelegramBotUpdatesListener(GuestServiceImpl guestService, SendInChatService sendInChatService,
-                                      GuestRepository guestRepository, DocumentsForPreparationRepository documentsForPreparationRepository,
-                                      InlineKeyboard inlineKeyboard, ShelterRepository shelterRepository, CallVolunteerService callVolunteerService) {
+                                      GuestRepository guestRepository, InlineKeyboard inlineKeyboard,
+                                       ShelterRepository shelterRepository, CallVolunteerService callVolunteerService) {
         this.guestService = guestService;
         this.sendInChatService = sendInChatService;
-        //  this.replyKeyboard = replyKeyboard; ReplyKeyboard replyKeyboard,
         this.guestRepository = guestRepository;
         this.inlineKeyboard = inlineKeyboard;
         this.shelterRepository = shelterRepository;
@@ -94,18 +91,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                     logger.info(shelterId + " " + button);
                     switch (button) {
                         case MENU_1_BUTTON_1, MENU_1_BUTTON_2, MENU_1_BUTTON_3,
-//                                MENU_1_BUTTON_4,
-                                MENU_1_1_BUTTON_1, MENU_1_1_BUTTON_2, MENU_1_1_BUTTON_3, MENU_1_1_BUTTON_4, MENU_1_1_BUTTON_5 -> {
+                                MENU_1_1_BUTTON_1, MENU_1_1_BUTTON_2, MENU_1_1_BUTTON_3,
+                                MENU_1_1_BUTTON_4, MENU_1_1_BUTTON_5, MENU_1_2_BUTTON_1,
+                                MENU_1_2_BUTTON_2, MENU_1_2_BUTTON_3, MENU_1_2_BUTTON_4,
+                                MENU_1_2_BUTTON_5, MENU_1_2_BUTTON_6, MENU_1_2_BUTTON_7,
+                                MENU_1_2_BUTTON_8, MENU_1_2_BUTTON_9 -> {
                             sendInChatService.chouseMenu(button, chatId, shelterId);
                         }
                         case MENU_1_BUTTON_4 -> callVolunteerService.callVolunteer(chatId);
 
-/*доработать после того как в таблицу document_for_preparation будет добавлен столбец с приютом
-                        case MENU_1_2_BUTTON_1, MENU_1_2_BUTTON_2, MENU_1_2_BUTTON_3, MENU_1_2_BUTTON_4, MENU_1_2_BUTTON_5, MENU_1_2_BUTTON_6, MENU_1_2_BUTTON_7, MENU_1_2_BUTTON_8, MENU_1_2_BUTTON_9 -> {
-                            sendInChatService.chouseMenu(button, chatId, shelterId);
-                        }
-
- */
                         default -> sendInChatService.sendMsg(chatId, "Некорректная команда");
                     }
 
