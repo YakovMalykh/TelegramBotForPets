@@ -53,7 +53,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
 
         if (docExists == null) {
 
-            Path filePath = Path.of(documentsPrepFolder, description + "." + getExtention(file));
+            Path filePath = Path.of(documentsPrepFolder, kindOfAnimal,  description + "." + getExtention(file));
 
             Files.createDirectories(filePath.getParent());
             Files.deleteIfExists(filePath);
