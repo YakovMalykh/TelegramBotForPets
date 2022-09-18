@@ -5,10 +5,19 @@ import org.springframework.stereotype.Service;
 import sky.pro.telegrambotforpets.constants.Buttons;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.model.Shelter;
+import sky.pro.telegrambotforpets.repositories.CatAdopterRepository;
+import sky.pro.telegrambotforpets.repositories.DogAdopterRepository;
 
 
 @Service
 public class InlineKeyboard extends Keyboard {
+    private final CatAdopterRepository catAdopterRepository;
+    private final DogAdopterRepository dogAdopterRepository;
+
+    public InlineKeyboard(CatAdopterRepository catAdopterRepository, DogAdopterRepository dogAdopterRepository) {
+        this.dogAdopterRepository = dogAdopterRepository;
+        this.catAdopterRepository = catAdopterRepository;
+    }
 
     public Keyboard Menu() {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
@@ -23,14 +32,25 @@ public class InlineKeyboard extends Keyboard {
         return replyKeyboardMarkup;
     }
 
-    /*  переделать кнопки из-за ограничения на количество символов в каллбекдата
-     */
-    public Keyboard MenuCommon(Long shelterId) {
+    public Keyboard MenuReport() {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
+                new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_1.getButtonName()).callbackData(Buttons.MENU_1_3_BUTTON_1.name()),
+                new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_2.getButtonName()).callbackData(Buttons.MENU_1_3_BUTTON_2.name()))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_3.getButtonName()).callbackData(Buttons.MENU_1_3_BUTTON_3.name()),
+                        new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_4.getButtonName()).callbackData(Buttons.MENU_1_3_BUTTON_4.name()))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_EXIT.getButtonName()).callbackData(Buttons.MENU_EXIT.name()));
+        return replyKeyboardMarkup;
+    }
+
+    public Keyboard MenuCommon(Shelter shelter, Long chatId) {
+        Long shelterId = shelter.getId();
+        InlineKeyboardMarkup replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton(Buttons.MENU_1_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_1),
                 new InlineKeyboardButton(Buttons.MENU_1_BUTTON_2.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_2))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_BUTTON_3.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_3),
-                        new InlineKeyboardButton(Buttons.MENU_1_BUTTON_4.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_4));
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_BUTTON_4.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_4));
+        if ((catAdopterRepository.findByChatId(chatId).isPresent() && shelter.getSpecialization().equals(KindOfAnimal.CATS.name())) || (dogAdopterRepository.findByChatId(chatId).isPresent() && shelter.getSpecialization().equals(KindOfAnimal.DOGS.name()))) {
+            replyKeyboardMarkup.addRow(new InlineKeyboardButton(Buttons.MENU_1_BUTTON_3.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_BUTTON_3));
+        }
         return replyKeyboardMarkup;
     }
 

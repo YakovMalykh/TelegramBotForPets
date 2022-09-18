@@ -1,6 +1,6 @@
 package sky.pro.telegrambotforpets.constants;
 
-public enum Buttons {
+public enum   Buttons {
     /*
     Начальное меню (этап 0)
      */
@@ -36,8 +36,17 @@ public enum Buttons {
 
     MENU_VOLANTER("Принять запрос"),
 
-    MENU_0_BUTTON_0("Нет такой команды");
+    MENU_0_BUTTON_0("Нет такой команды"),
+    MENU_EXIT("Выйти из меню"),
 
+    /* подменю меню Отчет */
+    MENU_1_3_BUTTON_1("Фото"),
+
+    MENU_1_3_BUTTON_2("Рацион"),
+
+    MENU_1_3_BUTTON_3("Общее самочувствие и привыкание"),
+
+    MENU_1_3_BUTTON_4("Изменение в поведении");
 
     private final String buttonName;
 

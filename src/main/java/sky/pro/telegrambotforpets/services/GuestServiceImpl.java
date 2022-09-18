@@ -54,6 +54,15 @@ public class GuestServiceImpl implements GuestService {
         logger.info("выполнился метод saveGuestToDB, в БД занесен Гость с именем " + userName + " и chatId " + chatId);
     }
 
+    public void saveContactToDB(Update update) {
+        Guest guest = new Guest();
+        guest.setUserName(update.message().contact().firstName());
+        guest.setChatId(update.message().contact().userId());
+        guest.setPhoneNumber(update.message().contact().phoneNumber());
+        guestRepository.save(guest);
+        logger.info("Данные о госте занесены в БД");
+    }
+
     @Override
     /**
      * метод проыверяет нет ли такого госят уже в нашей БД
