@@ -1,9 +1,12 @@
 package sky.pro.telegrambotforpets.model;
 
+import sky.pro.telegrambotforpets.constants.Gender;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
@@ -22,7 +25,7 @@ public abstract class Person {
     private String middleName;
     private String lastName;
     private String gender;
-    private Date birthday;
+    private LocalDate birthday;
     private String phoneNumber;
     private String address;
 
@@ -30,13 +33,13 @@ public abstract class Person {
     }
 
     public Person(String name, String middleName, String lastName, String gender,
-                  Date birthday, String phoneNumber, String address) {
+                  LocalDate birthday, String phoneNumber, String address) {
         this.name = name;
         this.middleName = middleName;
         this.lastName = lastName;
         this.gender = gender;
         this.birthday = birthday;
-        this.phoneNumber = phoneNumber;
+        setPhoneNumber(phoneNumber);
         this.address = address;
     }
 
@@ -76,9 +79,6 @@ public abstract class Person {
      * здесь ввел Enum, т.к. думаю возможны и другие варианты обозначения пола: "W", "Ж", "М".
      * если вводить их, то Enum будет удобен
      */
-    private enum Gender {
-        M, F
-    }
 
     /**
      * проверяю, что только один символ и он может быть
@@ -96,11 +96,11 @@ public abstract class Person {
         }
     }
 
-    public Date getBirthday() {
+    public LocalDate getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(Date birthday) {
+    public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
     }
 
@@ -116,13 +116,19 @@ public abstract class Person {
      */
     public void setPhoneNumber(String phoneNumber) {
         if (phoneNumber != null && !(phoneNumber.isBlank() && phoneNumber.isEmpty())) {
-
             this.phoneNumber = phoneNumber
                     .replace("+7", "8")
                     .replace(" ", "")
                     .replace("-", "")
                     .replace("(", "")
                     .replace(")", "");
+
+            if (phoneNumber.startsWith("7")) {
+                char[] chars = phoneNumber.toCharArray();
+                chars[0] = '8';
+                String newPhoneNumber = String.valueOf(chars);
+                this.phoneNumber = newPhoneNumber;
+            }
         } else {
             throw new IllegalArgumentException("введены некорректные данные");
         }
@@ -141,12 +147,12 @@ public abstract class Person {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return id.equals(person.id) && name.equals(person.name) && Objects.equals(middleName, person.middleName) && lastName.equals(person.lastName) && Objects.equals(gender, person.gender) && Objects.equals(birthday, person.birthday) && phoneNumber.equals(person.phoneNumber) && address.equals(person.address);
+        return name.equals(person.name) && middleName.equals(person.middleName) && lastName.equals(person.lastName) && gender.equals(person.gender) && birthday.equals(person.birthday) && phoneNumber.equals(person.phoneNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, middleName, lastName, gender, birthday, phoneNumber, address);
+        return Objects.hash(name, middleName, lastName, gender, birthday, phoneNumber);
     }
 
     @Override

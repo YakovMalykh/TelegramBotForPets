@@ -1,6 +1,7 @@
 package sky.pro.telegrambotforpets.services;
 
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.SendMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,9 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sky.pro.telegrambotforpets.interfaces.GuestService;
 import sky.pro.telegrambotforpets.model.Guest;
 import sky.pro.telegrambotforpets.repositories.GuestRepository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -25,6 +23,7 @@ public class GuestServiceImpl implements GuestService {
 
     /**
      * получение имени пользователя при первом обращении без запроса контакта
+     *
      * @param update
      * @return userName или Гость
      */
@@ -55,6 +54,15 @@ public class GuestServiceImpl implements GuestService {
         logger.info("выполнился метод saveGuestToDB, в БД занесен Гость с именем " + userName + " и chatId " + chatId);
     }
 
+    public void saveContactToDB(Update update) {
+        Guest guest = new Guest();
+        guest.setUserName(update.message().contact().firstName());
+        guest.setChatId(update.message().contact().userId());
+        guest.setPhoneNumber(update.message().contact().phoneNumber());
+        guestRepository.save(guest);
+        logger.info("Данные о госте занесены в БД");
+    }
+
     @Override
     /**
      * метод проыверяет нет ли такого госят уже в нашей БД
@@ -68,5 +76,10 @@ public class GuestServiceImpl implements GuestService {
         return guestRepository.findById(chatId).isPresent();
     }
 
-
+    @Override
+    public SendMessage firstMeeting(Update update) {
+        logger.info("выведено приветсвие при первом визите");
+        return new SendMessage(update.message().chat().id(), "Приветствую тебя! " +
+                "Я - бот приюта кошек и собак. Я могу ответить почти на все твои вопросы!");
+    }
 }

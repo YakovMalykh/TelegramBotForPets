@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -26,7 +25,7 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Transactional
 public class DocumentsForPreparationServiceImpl implements DocumentsForPreparationService {
 
-    private Logger logger = LoggerFactory.getLogger(DocumentsForPreparationServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(DocumentsForPreparationServiceImpl.class);
 
     @Value("${path.to.documents-for-preparation.folder}")
     private String documentsPrepFolder;
@@ -42,17 +41,19 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
      *
      * @param description
      * @param file
+     * @param kindOfAnimal
      * @return
      * @throws IOException
      */
     @Override
-    public boolean saveDocumentToDB(String description, MultipartFile file) throws IOException {
+    public boolean saveDocumentToDB(String description, MultipartFile file, String kindOfAnimal) throws IOException {
         DocumentsForPreparation docExists =
-                documentsForPreparationRepository.findFirstByDescriptionIgnoreCase(description);
+                documentsForPreparationRepository.findDocumentsForPreparationByDescriptionAndKindOfAnimal (description, kindOfAnimal);
+        
 
         if (docExists == null) {
 
-            Path filePath = Path.of(documentsPrepFolder, description + "." + getExtention(file));
+            Path filePath = Path.of(documentsPrepFolder, kindOfAnimal,  description + "." + getExtention(file));
 
             Files.createDirectories(filePath.getParent());
             Files.deleteIfExists(filePath);
@@ -66,6 +67,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
                 bis.transferTo(bos);
             }
             DocumentsForPreparation document = new DocumentsForPreparation();
+            document.setKindOfAnimal(kindOfAnimal);
             document.setDescription(description);
             document.setFilePath(filePath.toString());
             document.setFileSize(file.getSize());
@@ -96,18 +98,20 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
      * создаю новый путь на основании нового файла и копирую новый файл в директорию по новому пути,
      * устанавливаю в документ новый путь к файлу, записываю обновленный документ в БД
      *
-     * @param description, file
+     * @param description
+     * @param file
+     * @param kindOfAnimal
      * @return
      * @throws IOException
      */
     @Override
-    public ResponseEntity<Void> editDocuments(String description, MultipartFile file) throws IOException {
-        if (description == null && file == null) {
+    public ResponseEntity<Void> editDocuments(String description, MultipartFile file, String kindOfAnimal) throws IOException {
+        if (description == null || file == null || kindOfAnimal == null) {
             logger.info("при вызове метода editDocuments переданы некорректные данные");
             return ResponseEntity.badRequest().build();
         } else {
             DocumentsForPreparation document =
-                    documentsForPreparationRepository.findFirstByDescriptionIgnoreCase(description);
+                    documentsForPreparationRepository.findDocumentsForPreparationByDescriptionAndKindOfAnimal(description, kindOfAnimal);
             if (document != null) {
 
                 /**
@@ -135,6 +139,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
                 /**
                  * вставляю новый путь, новый размер и новый контенттайп в документ
                  */
+                document.setKindOfAnimal(kindOfAnimal);
                 document.setFilePath(newFilePath.toString());
                 document.setFileSize(file.getSize());
                 document.setMediaType(file.getContentType());
@@ -221,6 +226,11 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
             logger.info("метод removeDocument - файл из папки и документ из БД удалены");
             return ResponseEntity.ok().build();
         }
+    }
+
+    @Override
+    public ResponseEntity<DocumentsForPreparation> getDocumentsByDescription(String description) {
+        return ResponseEntity.ok(documentsForPreparationRepository.findDocumentsForPreparationByDescription(description));
     }
 
 }

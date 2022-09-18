@@ -1,7 +1,5 @@
 package sky.pro.telegrambotforpets.interfaces;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +16,7 @@ public interface DocumentsForPreparationService {
      * @return
      * @throws IOException
      */
-    boolean saveDocumentToDB(String description, MultipartFile file)throws IOException;
+    boolean saveDocumentToDB(String description, MultipartFile file, String kindOfAnimal)throws IOException;
     /**
      * equals проверяет только поле Id, поэтому при пересмотре логики equals
      * пересмотреть логику проверки в этом методе
@@ -29,7 +27,7 @@ public interface DocumentsForPreparationService {
      * @throws org.springframework.web.client.HttpClientErrorException.NotFound
      * @see DocumentsForPreparation#equals(Object)
      */
-    ResponseEntity<Void> editDocuments(String description, MultipartFile file)throws IOException;
+    ResponseEntity<Void> editDocuments(String description, MultipartFile file, String kindOfAnimal)throws IOException;
 
     ResponseEntity<DocumentsForPreparation> getDocument(Integer documentId);
 
@@ -51,6 +49,6 @@ public interface DocumentsForPreparationService {
      */
     ResponseEntity<Void> removeDocument(Integer documentId) throws IOException;
 
-
+    ResponseEntity <DocumentsForPreparation> getDocumentsByDescription(String descriptions);
 
 }

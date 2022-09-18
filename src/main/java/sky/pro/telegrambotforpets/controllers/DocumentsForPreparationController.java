@@ -5,14 +5,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.webjars.NotFoundException;
 import sky.pro.telegrambotforpets.constants.Descriptions;
+import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.interfaces.DocumentsForPreparationService;
 import sky.pro.telegrambotforpets.model.DocumentsForPreparation;
 
@@ -61,9 +60,12 @@ public class DocumentsForPreparationController {
                     "PREPARING_HOUSE_FOR_A_DISABLED_DOG, DOGHANDLER_ADVICIES, REASONS_FOR_REFUSAL",
                     example = "PREPARING_HOUSE_FOR_A_PUPPY")
             @RequestParam(name = "здесь используется enum Descriptions") Descriptions description,
-            @RequestParam(name = "загружаем файл") MultipartFile file) {
+            @RequestParam(name = "загружаем файл") MultipartFile file,
+            @Parameter(description = "Описание вида питомца. Доступны следующие варианты: " +
+                    "DOGS, CATS", example = "DOGS")
+            @RequestParam(name = "здесь используется enum KindOfAnimal")KindOfAnimal kindOfAnimal) {
         try {
-            boolean doesDocSave = docForPrepService.saveDocumentToDB(description.name(), file);
+            boolean doesDocSave = docForPrepService.saveDocumentToDB(description.name(), file, kindOfAnimal.name());
             if(doesDocSave){
                 return ResponseEntity.ok().build();
             }
@@ -71,6 +73,7 @@ public class DocumentsForPreparationController {
             ioException.printStackTrace();
             return ResponseEntity.notFound().build();
         }
+
         return ResponseEntity.badRequest().build();
     }
 
@@ -102,9 +105,12 @@ public class DocumentsForPreparationController {
                     "PREPARING_HOUSE_FOR_A_DISABLED_DOG, DOGHANDLER_ADVICIES, REASONS_FOR_REFUSAL",
                     example = "PREPARING_HOUSE_FOR_A_PUPPY")
             @RequestParam(name = "здесь используется enum Descriptions") Descriptions description,
-            @RequestParam(name = "загружаем файл") MultipartFile file) {
+            @RequestParam(name = "загружаем файл") MultipartFile file,
+            @Parameter(description = "Описание вида питомца. Доступны следующие варианты: " +
+                    "DOGS, CATS", example = "DOGS")
+            @RequestParam(name = "здесь используется enum KindOfAnimal")KindOfAnimal kindOfAnimal) {
         try {
-            docForPrepService.editDocuments(description.name(), file);
+            docForPrepService.editDocuments(description.name(), file, kindOfAnimal.name());
         } catch (IOException ioException) {
             ioException.printStackTrace();
             return ResponseEntity.notFound().build();
@@ -131,7 +137,6 @@ public class DocumentsForPreparationController {
     )
     /**
      * метод вычитывает файл из его папки
-     *
      * @param documentId
      * @param response
      * @throws IOException
@@ -201,7 +206,13 @@ public class DocumentsForPreparationController {
         }
     }
 
+    @GetMapping("/description")
+    public ResponseEntity<DocumentsForPreparation> getDocumentsByDescription(
 
+            @RequestParam(required = false, name = "описание документа") String description) {
+        return docForPrepService.getDocumentsByDescription(description);
+
+    }
     @Operation(
             summary = "удаление документа из БД и файла из папки по переданному ID",
             responses = {
@@ -224,5 +235,3 @@ public class DocumentsForPreparationController {
 
 
 }
-
-
