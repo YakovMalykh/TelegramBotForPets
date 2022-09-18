@@ -72,9 +72,7 @@ public class SendInChatServiceImpl implements SendInChatService {
                 case MENU_1_1_BUTTON_5 -> {
                     sendMsg(chatId, shelter.getSecurityPhoneNumber());
                 }
-//                case MENU_1_BUTTON_4 -> {
-//                    sendMsg(chatId, "Здась будем звать волонтера");
-//                }
+
                 case MENU_1_BUTTON_5 -> {
                     sendMsg(chatId, "Здась будем обрабатывать контакт");
                 }
@@ -82,7 +80,10 @@ public class SendInChatServiceImpl implements SendInChatService {
                     sendMsg(chatId, "Как взять питомца из приюта");
                     sendMenu(chatId, inlineKeyboard.MenuHowGetPet(shelter));
                 }
-
+                case MENU_1_BUTTON_3->{
+                    sendMsg(chatId, "Отправьте отчет по питомцу");
+                    sendMenu(chatId, inlineKeyboard.MenuReport());
+                }
                 case MENU_1_2_BUTTON_1 -> {
                     sendMsg(chatId, "Правила знакомства с питомцем");
                     sendDocumentsForPreparation(chatId, DOG_DAITING_RULES, shelter);
