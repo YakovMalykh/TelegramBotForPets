@@ -105,7 +105,7 @@ public class PetServiceImpl implements PetService {
             case DOGS -> {
                 try {
                     Dog dog = dogRepository.findById(petId).get();
-                    logger.info("метод getPetByName - найдена собака - " + dog.getName());
+                    logger.info("метод getPetById - найдена собака - " + dog.getName());
                     return dog;
                 } catch (NoSuchElementException e) {
                     logger.info(e.toString());
