@@ -2,6 +2,7 @@ package sky.pro.telegrambotforpets.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import sky.pro.telegrambotforpets.constants.AdoptionsResult;
+import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -13,10 +14,11 @@ public class Adoption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String kindOfAnimal;
     private Long petId;
     private Long adopterId;
     private LocalDate adoptionsDate;
-    private AdoptionsResult adoptionsResult;
+    private String adoptionsResult;
     private LocalDate endOfAdoption;
     private String reasonOfEnd;
 
@@ -27,8 +29,23 @@ public class Adoption {
     public Adoption() {
     }
 
+    public Adoption(String kindOfAnimal, Long petId, Long adopterId, LocalDate adoptionsDate) {
+        this.kindOfAnimal = kindOfAnimal;
+        this.petId = petId;
+        this.adopterId = adopterId;
+        this.adoptionsDate = adoptionsDate;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public String getKindOfAnimal() {
+        return kindOfAnimal;
+    }
+
+    public void setKindOfAnimal(String kindOfAnimal) {
+        this.kindOfAnimal = kindOfAnimal;
     }
 
     public Long getPetId() {
@@ -55,11 +72,11 @@ public class Adoption {
         this.adoptionsDate = adoptionsDate;
     }
 
-    public AdoptionsResult getAdoptionsResult() {
+    public String getAdoptionsResult() {
         return adoptionsResult;
     }
 
-    public void setAdoptionsResult(AdoptionsResult adoptionsResult) {
+    public void setAdoptionsResult(String adoptionsResult) {
         this.adoptionsResult = adoptionsResult;
     }
 
@@ -92,18 +109,19 @@ public class Adoption {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Adoption adoption = (Adoption) o;
-        return id.equals(adoption.id) && petId.equals(adoption.petId) && adopterId.equals(adoption.adopterId);
+        return id.equals(adoption.id) && kindOfAnimal == adoption.kindOfAnimal && petId.equals(adoption.petId) && adopterId.equals(adoption.adopterId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, petId, adopterId);
+        return Objects.hash(id, kindOfAnimal, petId, adopterId);
     }
 
     @Override
     public String toString() {
         return "Adoption{" +
                 "id=" + id +
+                ", kindOfAnimal=" + kindOfAnimal +
                 ", petId=" + petId +
                 ", adopterId=" + adopterId +
                 ", adoptionsDate=" + adoptionsDate +
