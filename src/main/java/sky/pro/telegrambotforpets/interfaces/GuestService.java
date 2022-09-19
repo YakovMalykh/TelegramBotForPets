@@ -11,6 +11,9 @@ public interface GuestService {
      * @param update
      */
     void saveGuestToDB (Update update);
+
+    void saveContactToDB(Update update);
+
     /**
      * метод проверяет нет ли уже такого госят в нашей БД
      * @param update - отсюда достаем ID

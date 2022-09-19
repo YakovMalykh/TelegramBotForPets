@@ -26,6 +26,9 @@ public class Report {
     @Column(name = "comment")
     private String comment;
 
+    @ManyToOne
+    private Adoption adoption;
+
     public Report() {
 
     }
