@@ -215,35 +215,6 @@ public class PetController {
     }
 
     @Operation(
-            summary = "устанавливанет питомцу усыновителя",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "указанному питомцу установлен выбранный усыновитель"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "по указанному id не найден питомец или усыновитель"
-                    )
-            }
-    )
-    @PutMapping("/set-adopter")
-    public ResponseEntity<Void> setAdopter(
-            @Parameter(description = "вид животного")
-            @RequestParam KindOfAnimal kindOfAnimal,
-            @Parameter(description = "id питомца")
-            @RequestParam Long petId,
-            @Parameter(description = "id усыновителя")
-            @RequestParam Long adopterId) {
-        boolean done = petService.appointAdopter(kindOfAnimal, petId, adopterId);
-        if (done) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @Operation(
             summary = "удаление питомца по id.По KindOfAnimal (вид животного) определяет, " +
                     "из какой БД удалить питомца",
             responses = {
