@@ -5,12 +5,10 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import sky.pro.telegrambotforpets.constants.AdoptionsResult;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.interfaces.CheckService;
-import sky.pro.telegrambotforpets.model.Adopter;
-import sky.pro.telegrambotforpets.model.CatAdopter;
-import sky.pro.telegrambotforpets.model.DogAdopter;
-import sky.pro.telegrambotforpets.model.Report;
+import sky.pro.telegrambotforpets.model.*;
 import sky.pro.telegrambotforpets.repositories.ReportRepository;
 
 import static sky.pro.telegrambotforpets.constants.Coment.*;
@@ -52,7 +50,7 @@ public class CheckServiceImpl implements CheckService {
     @Override// может его нужно сделать приватным и вызывать его из метода. которы ежедневно проверяет наличие отчета?
     public void checksAllFieldsAreFilled(Report report) {
         if (report != null) {
-            Long chatId = getChatId(report);
+            Long chatId = getChatId(report.getAdoption());
             if (chatId != null) {
                 String photoPath = report.getPhotoPath();
                 String ration = report.getRation();
@@ -79,9 +77,14 @@ public class CheckServiceImpl implements CheckService {
         }
     }
 
-    private Long getChatId(Report report) {
-        Long adopterId = report.getAdoption().getAdopterId();
-        KindOfAnimal kindOfAnimal = KindOfAnimal.valueOf(report.getAdoption().getKindOfAnimal());
+    /**
+     * ищет по записи об усыновлении chatID усыновителя
+     * @param adoption
+     * @return
+     */
+    private Long getChatId(Adoption adoption) {
+        Long adopterId = adoption.getAdopterId();
+        KindOfAnimal kindOfAnimal = KindOfAnimal.valueOf(adoption.getKindOfAnimal());
         Adopter adopter = adopterService.getAdopterById(adopterId, kindOfAnimal);
         if (adopter != null) {
             switch (kindOfAnimal) {
@@ -96,7 +99,36 @@ public class CheckServiceImpl implements CheckService {
             }
         }
         return null;
+    }
 
+    /**
+     * отправляет усыновителю сообщение с результатом испытательного срока
+     * @param adoption
+     * @param adoptionsResult
+     */
+    @Override
+    public void notifications(Adoption adoption, AdoptionsResult adoptionsResult) {
+        Long chatId = getChatId(adoption);
+        switch (adoptionsResult) {
+            case SUCCESS -> {
+                bot.execute(new SendMessage(chatId, "Поздравляем, вы прошли испытательный срок"));
+                logger.info("метод notifications - успех");
+            }
+            case EXTENSION_14 -> {
+                bot.execute(new SendMessage(chatId, "Испытательный срок продлен на 14 дней, " +
+                        "продолжайте присылать отчеты"));
+                logger.info("метод notifications - проделние на 14 дней");
+            }
+            case EXTENSION_30 -> {
+                bot.execute(new SendMessage(chatId, "Испытательный срок продлен на 30 дней, " +
+                        "продолжайте присылать отчеты"));
+                logger.info("метод notifications - проделние на 30 дней");
+            }
+            case FAIL -> {
+                bot.execute(new SendMessage(chatId, "Вы не прошли испытательный срок. Вам нужно вернуть питомца."));
+                logger.info("метод notifications - провал");
+            }
+        }
     }
 
 }
