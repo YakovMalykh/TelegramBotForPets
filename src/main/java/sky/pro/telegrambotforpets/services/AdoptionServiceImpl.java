@@ -7,11 +7,11 @@ import sky.pro.telegrambotforpets.constants.AdoptionsResult;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.interfaces.AdopterService;
 import sky.pro.telegrambotforpets.interfaces.AdoptionService;
+import sky.pro.telegrambotforpets.interfaces.CheckService;
 import sky.pro.telegrambotforpets.interfaces.PetService;
 import sky.pro.telegrambotforpets.model.Adoption;
 import sky.pro.telegrambotforpets.model.Cat;
 import sky.pro.telegrambotforpets.model.Dog;
-import sky.pro.telegrambotforpets.model.Pet;
 import sky.pro.telegrambotforpets.repositories.AdoptionRepository;
 
 import javax.transaction.Transactional;
@@ -28,11 +28,13 @@ public class AdoptionServiceImpl implements AdoptionService {
     private final AdoptionRepository adoptionRepository;
     private final PetService petService;
     private final AdopterService adopterService;
+    private final CheckService checkService;
 
-    public AdoptionServiceImpl(AdoptionRepository adoptionRepository, PetService petService, AdopterService adopterService) {
+    public AdoptionServiceImpl(AdoptionRepository adoptionRepository, PetService petService, AdopterService adopterService, CheckService checkService) {
         this.adoptionRepository = adoptionRepository;
         this.petService = petService;
         this.adopterService = adopterService;
+        this.checkService = checkService;
     }
 
     /**
@@ -61,7 +63,7 @@ public class AdoptionServiceImpl implements AdoptionService {
 
     /**
      * изменяет поле результат усыновления, по этому полю будем искать записи, по которым срок адаптации увеличен
-     *
+     * и отправляет в чат усыновителю результат испытательного периода
      * @param adoptionId
      * @param adoptionsResult
      * @return
@@ -71,6 +73,7 @@ public class AdoptionServiceImpl implements AdoptionService {
         Optional<Adoption> adoption = adoptionRepository.findById(adoptionId);
         if (adoption.isPresent()) {
             adoption.get().setAdoptionsResult(adoptionsResult.name());
+            checkService.notifications(adoption.get(), adoptionsResult);
             logger.info("метод setAdoptionsResult - поле результат усыновления успешно изменено");
             return true;
         } else {
