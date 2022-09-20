@@ -34,6 +34,13 @@ public interface AdoptionService {
     Optional<Adoption> getAdoptionById(Long adoptionId);
 
     List<Adoption> getAllAdoptions();
+
+    /**
+     * выбирает записи у которых испытательный срок заканчивается сегодня
+     * @return
+     */
+    List<Adoption> trialPeriodEndsToday();
+
     /**
      * удаляет запись об усыновлении из БД и обнуляет поле Усыновитель у питомца
      * @param adoptionId
