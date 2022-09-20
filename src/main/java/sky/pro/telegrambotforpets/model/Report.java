@@ -97,6 +97,14 @@ public class Report {
         this.comment = comment;
     }
 
+    public Adoption getAdoption() {
+        return adoption;
+    }
+
+    public void setAdoption(Adoption adoption) {
+        this.adoption = adoption;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
