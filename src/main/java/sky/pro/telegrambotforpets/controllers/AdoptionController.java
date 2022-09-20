@@ -110,6 +110,15 @@ public class AdoptionController {
         List<Adoption> allAdoptions = adoptionService.getAllAdoptions();
         return ResponseEntity.ok(allAdoptions);
     }
+    @Operation(
+            summary = "возвращает список записей об усыновлении, у которых испытательный срок заканчивается сегодня" +
+                    "в том числе после продления"
+    )
+    @GetMapping("/trial-period-ends-today")
+    public ResponseEntity<Collection<Adoption>> trialPeriodEndsToday() {
+        List<Adoption> adoptions = adoptionService.trialPeriodEndsToday();
+        return ResponseEntity.ok(adoptions);
+    }
 
 
     @Operation(
