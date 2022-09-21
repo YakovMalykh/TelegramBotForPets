@@ -9,11 +9,18 @@ import sky.pro.telegrambotforpets.constants.AdoptionsResult;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.interfaces.CheckService;
 import sky.pro.telegrambotforpets.model.*;
+import sky.pro.telegrambotforpets.repositories.AdoptionRepository;
 import sky.pro.telegrambotforpets.repositories.ReportRepository;
 
+import javax.transaction.Transactional;
+
+import java.util.List;
+
+import static sky.pro.telegrambotforpets.constants.AdoptionsResult.*;
 import static sky.pro.telegrambotforpets.constants.Coment.*;
 
 @Service
+@Transactional
 public class CheckServiceImpl implements CheckService {
 
     private final Logger logger = LoggerFactory.getLogger(CheckServiceImpl.class);
@@ -21,11 +28,13 @@ public class CheckServiceImpl implements CheckService {
     private final TelegramBot bot;
     private final ReportRepository reportRepository;
     private final AdopterServiceImpl adopterService;
+    private final AdoptionRepository adoptionRepository;
 
-    public CheckServiceImpl(TelegramBot bot, ReportRepository reportRepository, AdopterServiceImpl adopterService) {
+    public CheckServiceImpl(TelegramBot bot, ReportRepository reportRepository, AdopterServiceImpl adopterService, AdoptionRepository adoptionRepository) {
         this.bot = bot;
         this.reportRepository = reportRepository;
         this.adopterService = adopterService;
+        this.adoptionRepository = adoptionRepository;
     }
 
     /**
@@ -79,6 +88,7 @@ public class CheckServiceImpl implements CheckService {
 
     /**
      * ищет по записи об усыновлении chatID усыновителя
+     *
      * @param adoption
      * @return
      */
@@ -103,6 +113,7 @@ public class CheckServiceImpl implements CheckService {
 
     /**
      * отправляет усыновителю сообщение с результатом испытательного срока
+     *
      * @param adoption
      * @param adoptionsResult
      */
@@ -129,6 +140,11 @@ public class CheckServiceImpl implements CheckService {
                 logger.info("метод notifications - провал");
             }
         }
+    }
+
+    private List<Adoption> listWithTrialPeriod() {
+       return adoptionRepository.findAll().stream().filter(e ->
+                valueOf(e.getAdoptionsResult()) != SUCCESS && valueOf(e.getAdoptionsResult()) != FAIL).toList();
     }
 
 }

@@ -10,4 +10,5 @@ public interface AdoptionRepository extends JpaRepository<Adoption, Long> {
 
     List<Adoption> findByAdoptionsDateOrAdoptionsDateOrAdoptionsDate(LocalDate period30days, LocalDate period44days,
                                                                      LocalDate period60days);
+
 }

@@ -4,6 +4,8 @@ import sky.pro.telegrambotforpets.constants.AdoptionsResult;
 import sky.pro.telegrambotforpets.model.Adoption;
 import sky.pro.telegrambotforpets.model.Report;
 
+import java.util.List;
+
 public interface CheckService {
     /**
      * отправляет в чат усыновителю предупреждение и коммент волонтера по отчету
