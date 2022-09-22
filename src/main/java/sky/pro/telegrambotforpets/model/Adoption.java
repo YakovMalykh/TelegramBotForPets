@@ -127,8 +127,7 @@ public class Adoption {
                 ", adoptionsDate=" + adoptionsDate +
                 ", adoptionsResult=" + adoptionsResult +
                 ", endOfAdoption=" + endOfAdoption +
-                ", reasonOfEnd='" + reasonOfEnd + '\'' +
-                ", reports=" + reports +
+                ", reasonOfEnd='" + reasonOfEnd +
                 '}';
     }
 }

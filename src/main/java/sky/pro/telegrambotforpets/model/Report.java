@@ -1,5 +1,7 @@
 package sky.pro.telegrambotforpets.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -130,5 +132,16 @@ public class Report {
                 ", feeling='" + feeling + '\'' +
                 ", comment='" + comment + '\'' +
                 '}';
+    }
+
+    public int compareTo(Report report) {
+        if (this.date.isEqual(report.getDate())) {
+            return 0;
+        }
+        if (this.date.isBefore(report.getDate())) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 }

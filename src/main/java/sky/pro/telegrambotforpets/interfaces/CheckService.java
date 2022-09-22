@@ -15,11 +15,11 @@ public interface CheckService {
      */
     void reportIsPoorlyCompleted(Long chatId, String volunteersComment);
 
-    /**
-     * проверяет поля отчета и если поле не заполнено - высылает усыновителю сообщение, что его нужно заполнить
-     * @param report
-     */
-    void checksAllFieldsAreFilled(Report report);
+//    /**
+//     * проверяет поля отчета и если поле не заполнено - высылает усыновителю сообщение, что его нужно заполнить
+//     * @param report
+//     */
+//    void checksAllFieldsAreFilled(Report report);
 
     /**
      * отправляет усыновителю сообщение с результатом испытательного срока
@@ -27,4 +27,6 @@ public interface CheckService {
      * @param adoptionsResult
      */
     void notifications(Adoption adoption, AdoptionsResult adoptionsResult);
+
+    void dailyCheck();
 }
