@@ -7,6 +7,7 @@ import sky.pro.telegrambotforpets.constants.AdoptionsResult;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.interfaces.AdopterService;
 import sky.pro.telegrambotforpets.interfaces.AdoptionService;
+import sky.pro.telegrambotforpets.interfaces.CheckService;
 import sky.pro.telegrambotforpets.interfaces.PetService;
 import sky.pro.telegrambotforpets.model.Adoption;
 import sky.pro.telegrambotforpets.model.Cat;
@@ -18,6 +19,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static sky.pro.telegrambotforpets.constants.AdoptionsResult.*;
+
 @Service
 @Transactional
 public class AdoptionServiceImpl implements AdoptionService {
@@ -27,11 +30,13 @@ public class AdoptionServiceImpl implements AdoptionService {
     private final AdoptionRepository adoptionRepository;
     private final PetService petService;
     private final AdopterService adopterService;
+    private final CheckService checkService;
 
-    public AdoptionServiceImpl(AdoptionRepository adoptionRepository, PetService petService, AdopterService adopterService) {
+    public AdoptionServiceImpl(AdoptionRepository adoptionRepository, PetService petService, AdopterService adopterService, CheckService checkService) {
         this.adoptionRepository = adoptionRepository;
         this.petService = petService;
         this.adopterService = adopterService;
+        this.checkService = checkService;
     }
 
     /**
@@ -60,6 +65,7 @@ public class AdoptionServiceImpl implements AdoptionService {
 
     /**
      * изменяет поле результат усыновления, по этому полю будем искать записи, по которым срок адаптации увеличен
+     * и отправляет в чат усыновителю результат испытательного периода
      *
      * @param adoptionId
      * @param adoptionsResult
@@ -70,6 +76,7 @@ public class AdoptionServiceImpl implements AdoptionService {
         Optional<Adoption> adoption = adoptionRepository.findById(adoptionId);
         if (adoption.isPresent()) {
             adoption.get().setAdoptionsResult(adoptionsResult.name());
+            checkService.notifications(adoption.get(), adoptionsResult);
             logger.info("метод setAdoptionsResult - поле результат усыновления успешно изменено");
             return true;
         } else {
@@ -96,6 +103,25 @@ public class AdoptionServiceImpl implements AdoptionService {
     // @Override
     // public  Adoption adoption AdoptionServiceImpl(Long adopterId) {
     // }
+
+    /**
+     * выбирает записи у которых испытательный срок заканчивается сегодня
+     *
+     * @return
+     */
+    @Override
+    public List<Adoption> trialPeriodEndsToday() {
+        LocalDate today = LocalDate.now();
+        LocalDate period30daysStarted = today.minusDays(30);
+        LocalDate period44daysStarted = today.minusDays(44);
+        LocalDate period60daysStarted = today.minusDays(60);
+        List<Adoption> adoptionsByDate = adoptionRepository.findByAdoptionsDateOrAdoptionsDateOrAdoptionsDate(
+                period30daysStarted, period44daysStarted, period60daysStarted);
+        List<Adoption> adoptions = adoptionsByDate.stream().filter(e ->
+                        valueOf(e.getAdoptionsResult()) != SUCCESS && valueOf(e.getAdoptionsResult()) != FAIL)
+                .toList();
+        return adoptions;
+    }
 
     /**
      * удаляет запись об усыновлении из БД и обнуляет поле Усыновитель у питомца

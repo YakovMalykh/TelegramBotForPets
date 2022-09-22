@@ -22,6 +22,7 @@ public interface AdoptionService {
 
     /**
      * изменяет поле результат усыновления, по этому полю будем искать записи, по которым срок адаптации увеличен
+     * и отправляет в чат усыновителю результат испытательного периода
      * @param adoptionId
      * @param adoptionsResult
      * @return
@@ -36,6 +37,13 @@ public interface AdoptionService {
 
     // Optional<Adoption> getAdobtionByAdopterId (Long adopterId);
     List<Adoption> getAllAdoptions();
+
+    /**
+     * выбирает записи у которых испытательный срок заканчивается сегодня
+     * @return
+     */
+    List<Adoption> trialPeriodEndsToday();
+
     /**
      * удаляет запись об усыновлении из БД и обнуляет поле Усыновитель у питомца
      * @param adoptionId
