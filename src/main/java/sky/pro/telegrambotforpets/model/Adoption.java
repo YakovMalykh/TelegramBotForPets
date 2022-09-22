@@ -119,15 +119,13 @@ public class Adoption {
 
     @Override
     public String toString() {
-        return "Adoption{" +
-                "id=" + id +
-                ", kindOfAnimal=" + kindOfAnimal +
-                ", petId=" + petId +
-                ", adopterId=" + adopterId +
-                ", adoptionsDate=" + adoptionsDate +
-                ", adoptionsResult=" + adoptionsResult +
-                ", endOfAdoption=" + endOfAdoption +
-                ", reasonOfEnd='" + reasonOfEnd +
+        return "Adoption {" +
+                "id записи об усыновлении = " + id +
+                ", вид животного = " + kindOfAnimal +
+                ", Id питомца =" + petId +
+                ", Id усыновителя =" + adopterId +
+                ", Дата усыновления =" + adoptionsDate +
+                ", результат усыновления =" + adoptionsResult +
                 '}';
     }
 }
