@@ -31,4 +31,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
      * @return
      */
     Optional<Report> findByAdoptionAndDate(Adoption adoption, LocalDate date);
+
 }
