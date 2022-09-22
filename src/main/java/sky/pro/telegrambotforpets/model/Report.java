@@ -1,5 +1,7 @@
 package sky.pro.telegrambotforpets.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -11,9 +13,7 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "report_id")
     private Long id;
-    @Column(name = "adaptation_id")
-    private Long adaptationId;
-    @Column(name = "report_date")
+       @Column(name = "report_date")
     private LocalDate date;
     @Column(name = "photo_path")
     private String photoPath;
@@ -27,6 +27,8 @@ public class Report {
     private String comment;
 
     @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "adoption_id")
     private Adoption adoption;
 
     public Report() {
@@ -41,13 +43,6 @@ public class Report {
         this.id = id;
     }
 
-    public Long getAdaptationId() {
-        return adaptationId;
-    }
-
-    public void setAdaptationId(Long adaptationId) {
-        this.adaptationId = adaptationId;
-    }
 
     public LocalDate getDate() {
         return date;
@@ -97,30 +92,39 @@ public class Report {
         this.comment = comment;
     }
 
+
+    public Adoption getAdoption() {
+        return adoption;
+    }
+
+    public void setAdoption(Adoption adoption) {
+        this.adoption = adoption;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Report report = (Report) o;
-        return Objects.equals(id, report.id) && Objects.equals(adaptationId, report.adaptationId) && Objects.equals(date, report.date) && Objects.equals(photoPath, report.photoPath) && Objects.equals(ration, report.ration) && Objects.equals(behaivor, report.behaivor) && Objects.equals(feeling, report.feeling) && Objects.equals(comment, report.comment);
+        return Objects.equals(id, report.id) && Objects.equals(date, report.date) && Objects.equals(photoPath, report.photoPath) && Objects.equals(ration, report.ration) && Objects.equals(behaivor, report.behaivor) && Objects.equals(feeling, report.feeling) && Objects.equals(comment, report.comment) && Objects.equals(adoption, report.adoption);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, adaptationId, date, photoPath, ration, behaivor, feeling, comment);
+        return Objects.hash(id, date, photoPath, ration, behaivor, feeling, comment, adoption);
     }
 
     @Override
     public String toString() {
         return "Report{" +
                 "id=" + id +
-                ", adaptationId=" + adaptationId +
                 ", date=" + date +
                 ", photoPath='" + photoPath + '\'' +
                 ", ration='" + ration + '\'' +
                 ", behaivor='" + behaivor + '\'' +
                 ", feeling='" + feeling + '\'' +
                 ", comment='" + comment + '\'' +
+                ", adoption=" + adoption +
                 '}';
     }
 }

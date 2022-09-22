@@ -11,7 +11,6 @@ import sky.pro.telegrambotforpets.interfaces.PetService;
 import sky.pro.telegrambotforpets.model.Adoption;
 import sky.pro.telegrambotforpets.model.Cat;
 import sky.pro.telegrambotforpets.model.Dog;
-import sky.pro.telegrambotforpets.model.Pet;
 import sky.pro.telegrambotforpets.repositories.AdoptionRepository;
 
 import javax.transaction.Transactional;
@@ -83,11 +82,20 @@ public class AdoptionServiceImpl implements AdoptionService {
     public Optional<Adoption> getAdoptionById(Long adoptionId) {
         return adoptionRepository.findById(adoptionId);
     }
-
+    @Override
+    public Optional<Adoption> getFirstAdoptionByAdopterIdAndKindOfAnimal(Long adoptionId, String kindOfAnimal) {
+        return adoptionRepository.findFirstByAdopterIdAndKindOfAnimal(adoptionId, kindOfAnimal);
+    }
+    @Override
+    public List<Optional<Adoption>> getAdoptionByAdopterId(Long adopterId) {return adoptionRepository.findAdoptionByAdopterId(adopterId);}
     @Override
     public List<Adoption> getAllAdoptions() {
         return adoptionRepository.findAll();
     }
+
+    // @Override
+    // public  Adoption adoption AdoptionServiceImpl(Long adopterId) {
+    // }
 
     /**
      * удаляет запись об усыновлении из БД и обнуляет поле Усыновитель у питомца

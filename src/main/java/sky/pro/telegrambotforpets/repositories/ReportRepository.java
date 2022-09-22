@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface ReportRepository extends JpaRepository <Report,Long> {
     Optional<Report> findReportById(Long id);
 
-    Optional<Report> findReportByDateAndAdaptationId(LocalDate date, Long id);
+    Optional<Report> findReportByDateAndAdoption_Id(LocalDate date, Long id);
 }

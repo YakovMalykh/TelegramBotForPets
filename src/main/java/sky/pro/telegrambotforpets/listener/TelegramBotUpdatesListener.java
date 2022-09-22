@@ -10,21 +10,21 @@ import org.springframework.stereotype.Service;
 import sky.pro.telegrambotforpets.constants.Buttons;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.constants.ReportFild;
-import sky.pro.telegrambotforpets.interfaces.GuestService;
-import sky.pro.telegrambotforpets.interfaces.ReportService;
-import sky.pro.telegrambotforpets.interfaces.SendInChatService;
+import sky.pro.telegrambotforpets.interfaces.*;
 import sky.pro.telegrambotforpets.menu.InlineKeyboard;
+import sky.pro.telegrambotforpets.model.Adopter;
+import sky.pro.telegrambotforpets.model.Adoption;
 import sky.pro.telegrambotforpets.model.Shelter;
 import sky.pro.telegrambotforpets.repositories.GuestRepository;
-import sky.pro.telegrambotforpets.repositories.ShelterRepository;
 import sky.pro.telegrambotforpets.services.CallVolunteerService;
 import sky.pro.telegrambotforpets.services.GuestServiceImpl;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
-import static sky.pro.telegrambotforpets.constants.Buttons.MENU_1_3_BUTTON_1;
 import static sky.pro.telegrambotforpets.constants.Buttons.MENU_EXIT;
 import static sky.pro.telegrambotforpets.constants.Coment.COMENT_FILLING_REPORT;
 
@@ -43,20 +43,28 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     //  private final sky.pro.telegrambotforpets.menu.ReplyKeyboard replyKeyboard;
     private final sky.pro.telegrambotforpets.menu.InlineKeyboard inlineKeyboard;
     private final GuestRepository guestRepository;
-    private final ShelterRepository shelterRepository;
+    private final ShelterService shelterService;
     private final CallVolunteerService callVolunteerService;
     private final ReportService reportService;
 
+
+    private final PetService petService;
+    private final AdopterService adopterService;
+    private final AdoptionService adoptionService;
+
     public TelegramBotUpdatesListener(GuestServiceImpl guestService, SendInChatService sendInChatService,
                                       GuestRepository guestRepository, InlineKeyboard inlineKeyboard,
-                                      ShelterRepository shelterRepository, CallVolunteerService callVolunteerService, ReportService reportService) {
+                                      ShelterService shelterService, CallVolunteerService callVolunteerService, ReportService reportService, PetService petService, AdopterService adopterService, AdoptionService adoptionService) {
         this.guestService = guestService;
         this.sendInChatService = sendInChatService;
         this.guestRepository = guestRepository;
         this.inlineKeyboard = inlineKeyboard;
-        this.shelterRepository = shelterRepository;
+        this.shelterService = shelterService;
         this.callVolunteerService = callVolunteerService;
         this.reportService = reportService;
+        this.petService = petService;
+        this.adopterService = adopterService;
+        this.adoptionService = adoptionService;
     }
 
     @PostConstruct
@@ -64,9 +72,9 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         telegramBot.setUpdatesListener(this);
     }
 
-    private final Long adoptationId = 1L;
+    // private final Long adoptationId = 1L;
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
-    private HashMap<Long, ReportFild> updateStatus = new HashMap<>();
+    private HashMap<Long, String[]> updateStatus = new HashMap<>();
 
     @Override
     public int process(List<Update> updates) {
@@ -74,33 +82,25 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             //добавил здесь проверку, чтобы бот не реагировал на сообщения в групповых чатах волонтеров
             if (update.message() != null && !callVolunteerService.isItGroupChatToTalkWithVolunteer(update)) {
                 if (updateStatus.containsKey(update.message().chat().id())) {
-
                     logger.info("проверка статуса");
-                    ReportFild reportFild = updateStatus.get(update.message().chat().id());
-                    switch (updateStatus.get(update.message().chat().id())) {
+                    ReportFild reportFild = ReportFild.valueOf(updateStatus.get(update.message().chat().id())[0]);
+                    Long adoptationId = Long.valueOf(updateStatus.get(update.message().chat().id())[1]);
+                    switch (reportFild) {
 
                         case PHOTO -> {
-                            if (update.message().photo() != null) {
-/* в работе
-                                long chat_id = update.message().chat().id();
-                                List<PhotoSize> photos = List.of(update.message().photo());
-                                String f_id = photos.stream()
-
-                                        .findFirst()
-                                        .orElse(null).fileId();
-
-                                   String url= "https://api.telegram.org/bot"+telegramBot.getToken()+"/getFile?file_id="+f_id;
-
-                                String caption = "file_id: " + f_id ;
-                                SendPhoto msg = new SendPhoto(chat_id,f_id);
-                                logger.info(url);
-                                logger.info(f_id);
-                                */
-                                logger.info("фото");
-
+                            if (update.message().document() != null) {
+                                String msg;
+                                try {
+                                    msg = reportService.saveReportFotoFildToDB_(adoptationId, update.message().document(), update.message().chat().id());
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                sendInChatService.sendMsg(update.message().chat().id(), msg);
+                            } else if (update.message().photo() != null) {
+                                sendInChatService.sendMsg(update.message().chat().id(), "Пожалуйста, отправьте фото не сжаттым");
                             } else {
                                 logger.info("не фото");
-                                sendInChatService.sendMsg(update.message().chat().id(), "отправьте фото или нажмите кнопку " + MENU_EXIT.getButtonName());
+                                sendInChatService.sendMsg(update.message().chat().id(), "отправьте несколько фото, после завершения отправки нажмите кнопку " + MENU_EXIT.getButtonName());
                             }
                         }
                         case RASION, FEELING, BEHAIVOR -> {
@@ -122,7 +122,6 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                             telegramBot.execute(guestService.firstMeeting(update));
                             guestService.saveGuestToDB(update);
                         }
-                        logger.info("update " + update.message().text());
                         sendInChatService.sendMenu(update.message().chat().id(), inlineKeyboard.Menu());
                     }
                     if (!(update.message().contact() == null)) {
@@ -148,8 +147,28 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                         case MENU_1_BUTTON_4 -> callVolunteerService.callVolunteer(chatId);
                         case MENU_1_BUTTON_3 -> {
                             sendInChatService.sendMsg(chatId, COMENT_FILLING_REPORT);
-                            sendInChatService.sendMenu(chatId, inlineKeyboard.MenuReport());
+                            sendInChatService.sendMenu(chatId, inlineKeyboard.MenuReport(shelterId));
                         }
+                        case MENU_1_3_BUTTON_1, MENU_1_3_BUTTON_2, MENU_1_3_BUTTON_3, MENU_1_3_BUTTON_4 -> {
+                            sendInChatService.sendMsg(chatId, "отправьте " + button.getButtonName() + " или нажмите кнопку " + MENU_EXIT.getButtonName());
+                            Shelter shelter = shelterService.getShelter(shelterId);
+                            KindOfAnimal kindOfAnimal = KindOfAnimal.valueOf(shelter.getSpecialization());
+                            Optional<Adopter> adopter = adopterService.getAdopterByChatIdAndKindOfAnimal(chatId, kindOfAnimal);
+                            if (adopter.isPresent()) {
+                                Optional<Adoption> adoptation = adoptionService.getFirstAdoptionByAdopterIdAndKindOfAnimal(adopter.get().getId(), kindOfAnimal.name());
+                                String repotrF;
+                                switch (button) {
+                                    case MENU_1_3_BUTTON_1 -> repotrF = String.valueOf(ReportFild.PHOTO);
+                                    case MENU_1_3_BUTTON_2 -> repotrF = String.valueOf(ReportFild.RASION);
+                                    case MENU_1_3_BUTTON_3 -> repotrF = String.valueOf(ReportFild.FEELING);
+                                    case MENU_1_3_BUTTON_4, default -> repotrF = String.valueOf(ReportFild.BEHAIVOR);
+                                }
+                                String[] mass = new String[]{repotrF, adoptation.get().getId().toString()};
+                                updateStatus.put(chatId, mass);
+                            }
+                        }
+
+
                         default -> sendInChatService.sendMsg(chatId, "Некорректная команда");
                     }
 
@@ -165,22 +184,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                         case MENU_0_BUTTON_2 -> {
                             choseShelter(chatId, Buttons.valueOf(update.callbackQuery().data()), KindOfAnimal.CATS);
                         }
-                        case MENU_1_3_BUTTON_1 -> {
-                            sendInChatService.sendMsg(chatId, "отправьте " + MENU_1_3_BUTTON_1.getButtonName() + " или нажмите кнопку " + MENU_EXIT.getButtonName());
-                            updateStatus.put(chatId, ReportFild.PHOTO);
-                        }
-                        case MENU_1_3_BUTTON_2 -> {
-                            sendInChatService.sendMsg(chatId, "отправьте " + Buttons.valueOf(update.callbackQuery().data()).getButtonName() + " или нажмите кнопку " + MENU_EXIT.getButtonName());
-                            updateStatus.put(chatId, ReportFild.RASION);
-                        }
-                        case MENU_1_3_BUTTON_3 -> {
-                            sendInChatService.sendMsg(chatId, "отправьте " + Buttons.valueOf(update.callbackQuery().data()).getButtonName() + " или нажмите кнопку " + MENU_EXIT.getButtonName());
-                            updateStatus.put(chatId, ReportFild.FEELING);
-                        }
-                        case MENU_1_3_BUTTON_4 -> {
-                            sendInChatService.sendMsg(chatId, "отправьте " + Buttons.valueOf(update.callbackQuery().data()).getButtonName() + " или нажмите кнопку " + MENU_EXIT.getButtonName());
-                            updateStatus.put(chatId, ReportFild.BEHAIVOR);
-                        }
+
                     }
                 }
             }
@@ -192,7 +196,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     public void choseShelter(Long chatId, Buttons button, KindOfAnimal kindOfAnimal) {
         logger.info("выбран " + button.name());
-        Shelter shelter = shelterRepository.findShelterBySpecialization(kindOfAnimal.name());
+        Shelter shelter = shelterService.findShelterBySpecialization(kindOfAnimal.name());
         if (shelter != null) {
             sendInChatService.sendMenu(chatId, inlineKeyboard.MenuCommon(shelter, chatId));
         } else {

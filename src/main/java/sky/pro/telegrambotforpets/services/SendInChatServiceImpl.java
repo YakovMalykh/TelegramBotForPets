@@ -82,7 +82,7 @@ public class SendInChatServiceImpl implements SendInChatService {
                 }
                 case MENU_1_BUTTON_3->{
                     sendMsg(chatId, "Отправьте отчет по питомцу");
-                    sendMenu(chatId, inlineKeyboard.MenuReport());
+                    sendMenu(chatId, inlineKeyboard.MenuReport(shelterId));
                 }
                 case MENU_1_2_BUTTON_1 -> {
                     sendMsg(chatId, "Правила знакомства с питомцем");
