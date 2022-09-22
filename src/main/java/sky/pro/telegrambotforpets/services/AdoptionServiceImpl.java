@@ -19,6 +19,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static sky.pro.telegrambotforpets.constants.AdoptionsResult.*;
+
 @Service
 @Transactional
 public class AdoptionServiceImpl implements AdoptionService {
@@ -64,6 +66,7 @@ public class AdoptionServiceImpl implements AdoptionService {
     /**
      * изменяет поле результат усыновления, по этому полю будем искать записи, по которым срок адаптации увеличен
      * и отправляет в чат усыновителю результат испытательного периода
+     *
      * @param adoptionId
      * @param adoptionsResult
      * @return
@@ -90,6 +93,25 @@ public class AdoptionServiceImpl implements AdoptionService {
     @Override
     public List<Adoption> getAllAdoptions() {
         return adoptionRepository.findAll();
+    }
+
+    /**
+     * выбирает записи у которых испытательный срок заканчивается сегодня
+     *
+     * @return
+     */
+    @Override
+    public List<Adoption> trialPeriodEndsToday() {
+        LocalDate today = LocalDate.now();
+        LocalDate period30daysStarted = today.minusDays(30);
+        LocalDate period44daysStarted = today.minusDays(44);
+        LocalDate period60daysStarted = today.minusDays(60);
+        List<Adoption> adoptionsByDate = adoptionRepository.findByAdoptionsDateOrAdoptionsDateOrAdoptionsDate(
+                period30daysStarted, period44daysStarted, period60daysStarted);
+        List<Adoption> adoptions = adoptionsByDate.stream().filter(e ->
+                        valueOf(e.getAdoptionsResult()) != SUCCESS && valueOf(e.getAdoptionsResult()) != FAIL)
+                .toList();
+        return adoptions;
     }
 
     /**

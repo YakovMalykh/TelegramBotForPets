@@ -127,7 +127,7 @@ public class AdopterController {
                     )
             }
     )
-    @GetMapping("/{id}")
+    @GetMapping("/{adopterId}")
     public ResponseEntity<Adopter> getAdopterById(
             @PathVariable Long adopterId,
             @Parameter(description = "вид животного, по нему определяется в какой БД нужно искать усыновителя")
