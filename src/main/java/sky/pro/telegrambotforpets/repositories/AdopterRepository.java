@@ -6,6 +6,7 @@ import sky.pro.telegrambotforpets.model.DogAdopter;
 
 import java.util.Optional;
 
+
 public class AdopterRepository {
     private final CatAdopterRepository catAdopterRepository;
     private final DogAdopterRepository dogAdopterRepository;

@@ -26,12 +26,12 @@ public class InlineKeyboard extends Keyboard {
         return replyKeyboardMarkup;
     }
 
-    public Keyboard MenuTest() {
+    /*  public Keyboard MenuTest() {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton("fgrthjty").switchInlineQueryCurrentChat("dfbfgb"));
         return replyKeyboardMarkup;
     }
-
+*/
     public Keyboard MenuReport(Long shelterId) {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_3_BUTTON_1.name()),
