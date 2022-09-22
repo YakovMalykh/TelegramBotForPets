@@ -4,16 +4,27 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import sky.pro.telegrambotforpets.constants.AdoptionsResult;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.interfaces.CheckService;
 import sky.pro.telegrambotforpets.model.*;
+import sky.pro.telegrambotforpets.repositories.AdoptionRepository;
 import sky.pro.telegrambotforpets.repositories.ReportRepository;
+import sky.pro.telegrambotforpets.repositories.VolunteerRepository;
 
+import javax.transaction.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static sky.pro.telegrambotforpets.constants.AdoptionsResult.*;
 import static sky.pro.telegrambotforpets.constants.Coment.*;
 
 @Service
+@Transactional
 public class CheckServiceImpl implements CheckService {
 
     private final Logger logger = LoggerFactory.getLogger(CheckServiceImpl.class);
@@ -21,11 +32,15 @@ public class CheckServiceImpl implements CheckService {
     private final TelegramBot bot;
     private final ReportRepository reportRepository;
     private final AdopterServiceImpl adopterService;
+    private final AdoptionRepository adoptionRepository;
+    private final VolunteerRepository volunteerRepository;
 
-    public CheckServiceImpl(TelegramBot bot, ReportRepository reportRepository, AdopterServiceImpl adopterService) {
+    public CheckServiceImpl(TelegramBot bot, ReportRepository reportRepository, AdopterServiceImpl adopterService, AdoptionRepository adoptionRepository, VolunteerRepository volunteerRepository) {
         this.bot = bot;
         this.reportRepository = reportRepository;
         this.adopterService = adopterService;
+        this.adoptionRepository = adoptionRepository;
+        this.volunteerRepository = volunteerRepository;
     }
 
     /**
@@ -47,8 +62,7 @@ public class CheckServiceImpl implements CheckService {
      *
      * @param report
      */
-    @Override// может его нужно сделать приватным и вызывать его из метода. которы ежедневно проверяет наличие отчета?
-    public void checksAllFieldsAreFilled(Report report) {
+    private void checksAllFieldsAreFilled(Report report) {
         if (report != null) {
             Long chatId = getChatId(report.getAdoption());
             if (chatId != null) {
@@ -79,6 +93,7 @@ public class CheckServiceImpl implements CheckService {
 
     /**
      * ищет по записи об усыновлении chatID усыновителя
+     *
      * @param adoption
      * @return
      */
@@ -103,6 +118,7 @@ public class CheckServiceImpl implements CheckService {
 
     /**
      * отправляет усыновителю сообщение с результатом испытательного срока
+     *
      * @param adoption
      * @param adoptionsResult
      */
@@ -130,5 +146,60 @@ public class CheckServiceImpl implements CheckService {
             }
         }
     }
+
+    /**
+     * возвращает список усыновлений на испытательном сроке, включая продленные
+     * @return
+     */
+    private List<Adoption> listWithTrialPeriod() {//здесь метод падает с ошибкой, елси в поле результат нет
+        // даже  Null. Такое возможно только если руками в БД зайти и очистить поле.
+        return adoptionRepository.findAll().stream().filter(e ->
+                valueOf(e.getAdoptionsResult()) != SUCCESS && valueOf(e.getAdoptionsResult()) != FAIL).toList();
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 09 * * *")//будет выполняться каддый день в 9:00
+    public void dailyCheck() {
+        // получаем список всех усыновлений на испытательном сроке, включаю продленные
+        List<Adoption> adoptions = listWithTrialPeriod();
+
+        //нам интересен вчерашний день
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        //проходим циклом по всем полученным усыновлениям
+        for (int i = 0; i < adoptions.size(); i++) {
+            // получаем каждое усыновление из списка
+            Adoption certainAdoption = adoptions.get(i);
+            // проверяем есть ли у конкретного усыновления отчет с вчерашней датой
+            Optional<Report> reportByYesterday = reportRepository.findByAdoptionAndDate(certainAdoption, yesterday);
+
+            // если отчет с вчерашней датой есть
+            if (reportByYesterday.isPresent()) {
+                // проверяем что у него заполнены все поля
+                logger.info("метод dailyCheck - отчет за вчерашний день есть, " +
+                        "прошла проверка заполнены ли все поля отчета");
+                checksAllFieldsAreFilled(reportByYesterday.get());
+            } else {//если отчета с вчерашней датой нет, получаем chatID из усыновления
+                Long chatIdInThisAdoption = getChatId(certainAdoption);
+                // оправляем напоминание в чат усыновителю
+                bot.execute(new SendMessage(chatIdInThisAdoption, "Напоминаем о необходимости ежедневно " +
+                        "высылать отчеты до истечения испытательного срока"));
+                logger.info("метод dailyCheck - отчета за вчерашний день нет - отправлено напоминание усыновителю");
+                // и проверяем, а был ли отчет за позавчера
+                Optional<Report> isReportForDayBeforeYesterdayPresented =
+                        reportRepository.findByAdoptionAndDate(certainAdoption, yesterday.minusDays(1));
+                // если отчета за позавчера нет, то рассылаем всем волонтерам в чаты сообщение об этом
+                if (isReportForDayBeforeYesterdayPresented.isEmpty() &&
+                        certainAdoption.getAdoptionsDate().isBefore(yesterday)) {
+                    logger.info("метод dailyCheck - нет отчета за 2 дня - разослано уведомление волонтерам в чаты" );
+                    volunteerRepository.findAll().stream().forEach(
+                            v -> bot.execute(new SendMessage(v.getVolunteerChatId(),
+                                    "не присылался отчет уже 2 дня по записи об усыновлении " + certainAdoption))
+                    );
+                }
+            }
+        }
+    }
+
 
 }
