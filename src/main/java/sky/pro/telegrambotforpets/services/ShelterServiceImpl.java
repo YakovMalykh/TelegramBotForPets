@@ -78,7 +78,7 @@ public class ShelterServiceImpl implements ShelterService {
      */
     private String saveFileToFolder(
             TypeOfFiles typeOfFiles, String sheltersName, MultipartFile file, String pathToFolder) throws IOException {
-        Path filePath = Path.of(pathToFolder, sheltersName + "-" + typeOfFiles.name() + "." + getExtention(file));
+        Path filePath = Path.of(pathToFolder, sheltersName,sheltersName + "-" + typeOfFiles.name() + "." + getExtention(file));
         Files.createDirectories(filePath.getParent());
         Files.deleteIfExists(filePath);
 
@@ -169,5 +169,10 @@ public class ShelterServiceImpl implements ShelterService {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public Shelter findShelterBySpecialization(String kindOfAnimal) {
+        return shelterRepository.findShelterBySpecialization(kindOfAnimal);
     }
 }

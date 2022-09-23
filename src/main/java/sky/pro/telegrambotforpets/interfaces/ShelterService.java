@@ -25,4 +25,6 @@ public interface ShelterService {
     List<Shelter> getAllShelters();
 
     boolean removeShelter(Long id);
+
+    Shelter findShelterBySpecialization(String name);
 }

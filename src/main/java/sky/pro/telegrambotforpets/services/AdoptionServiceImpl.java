@@ -89,11 +89,20 @@ public class AdoptionServiceImpl implements AdoptionService {
     public Optional<Adoption> getAdoptionById(Long adoptionId) {
         return adoptionRepository.findById(adoptionId);
     }
-
+    @Override
+    public Optional<Adoption> getFirstAdoptionByAdopterIdAndKindOfAnimal(Long adoptionId, String kindOfAnimal) {
+        return adoptionRepository.findFirstByAdopterIdAndKindOfAnimal(adoptionId, kindOfAnimal);
+    }
+    @Override
+    public List<Optional<Adoption>> getAdoptionByAdopterId(Long adopterId) {return adoptionRepository.findAdoptionByAdopterId(adopterId);}
     @Override
     public List<Adoption> getAllAdoptions() {
         return adoptionRepository.findAll();
     }
+
+    // @Override
+    // public  Adoption adoption AdoptionServiceImpl(Long adopterId) {
+    // }
 
     /**
      * выбирает записи у которых испытательный срок заканчивается сегодня

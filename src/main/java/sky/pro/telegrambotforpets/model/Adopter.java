@@ -4,7 +4,7 @@ import javax.persistence.MappedSuperclass;
 import java.time.LocalDate;
 
 @MappedSuperclass
-public class Adopter extends Person{
+public class Adopter extends Person {
 
 
     private String kindOfAnimal;
@@ -21,6 +21,7 @@ public class Adopter extends Person{
     public String getKindOfAnimal() {
         return kindOfAnimal;
     }
+
     /**
      * соответствует Enum KindOfAnimal
      */

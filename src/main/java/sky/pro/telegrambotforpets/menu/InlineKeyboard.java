@@ -26,18 +26,18 @@ public class InlineKeyboard extends Keyboard {
         return replyKeyboardMarkup;
     }
 
-    public Keyboard MenuTest() {
+    /*  public Keyboard MenuTest() {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton("fgrthjty").switchInlineQueryCurrentChat("dfbfgb"));
         return replyKeyboardMarkup;
     }
-
-    public Keyboard MenuReport() {
+*/
+    public Keyboard MenuReport(Long shelterId) {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
-                new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_1.getButtonName()).callbackData(Buttons.MENU_1_3_BUTTON_1.name()),
-                new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_2.getButtonName()).callbackData(Buttons.MENU_1_3_BUTTON_2.name()))
-                .addRow(new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_3.getButtonName()).callbackData(Buttons.MENU_1_3_BUTTON_3.name()),
-                        new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_4.getButtonName()).callbackData(Buttons.MENU_1_3_BUTTON_4.name()))
+                new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_3_BUTTON_1.name()),
+                new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_2.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_3_BUTTON_2.name()))
+                .addRow(new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_3.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_3_BUTTON_3.name()),
+                        new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_4.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_3_BUTTON_4.name()))
                 .addRow(new InlineKeyboardButton(Buttons.MENU_EXIT.getButtonName()).callbackData(Buttons.MENU_EXIT.name()));
         return replyKeyboardMarkup;
     }

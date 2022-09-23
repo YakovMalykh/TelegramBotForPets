@@ -1,11 +1,9 @@
 package sky.pro.telegrambotforpets.interfaces;
 
-import io.swagger.v3.oas.annotations.Operation;
 import sky.pro.telegrambotforpets.constants.AdoptionsResult;
 import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 import sky.pro.telegrambotforpets.model.Adoption;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +31,11 @@ public interface AdoptionService {
 
     Optional<Adoption> getAdoptionById(Long adoptionId);
 
+    Optional<Adoption> getFirstAdoptionByAdopterIdAndKindOfAnimal(Long adoptionId,String kindOfAnimal);
+
+    List<Optional<Adoption>> getAdoptionByAdopterId(Long adopterId);
+
+    // Optional<Adoption> getAdobtionByAdopterId (Long adopterId);
     List<Adoption> getAllAdoptions();
 
     /**

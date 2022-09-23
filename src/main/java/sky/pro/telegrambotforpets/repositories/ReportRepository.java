@@ -12,9 +12,6 @@ import java.util.Optional;
 public interface ReportRepository extends JpaRepository<Report, Long> {
     Optional<Report> findReportById(Long id);
 
-    // ты же удаляешь этот метод? поле AdoptationId нам не нужно в сущности отчета
-    Optional<Report> findReportByDateAndAdaptationId(LocalDate date, Long id);
-
     /**
      * вернет список отчетов по усыновлениям на испытательном сроке
      * @return List
@@ -31,4 +28,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
      * @return
      */
     Optional<Report> findByAdoptionAndDate(Adoption adoption, LocalDate date);
+      Optional<Report> findReportByDateAndAdoption_Id(LocalDate date, Long id);
 }

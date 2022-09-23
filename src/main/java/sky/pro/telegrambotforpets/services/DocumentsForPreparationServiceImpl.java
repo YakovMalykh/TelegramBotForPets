@@ -124,7 +124,7 @@ public class DocumentsForPreparationServiceImpl implements DocumentsForPreparati
                 /**
                  * создаю новый путь
                  */
-                Path newFilePath = Path.of(documentsPrepFolder, description + "." + getExtention(file));
+                Path newFilePath = Path.of(documentsPrepFolder, kindOfAnimal, description + "." + getExtention(file));
                 /**
                  * кладу нолвый файл по новому пути
                  */
