@@ -129,7 +129,8 @@ public class AdoptionServiceImpl implements AdoptionService {
      * @param adoptionId
      * @return
      */
-    @Override
+    @Override// из контроллера удалил этот метод, т.к. усыновление должно закончиться логически либо успехом,
+    // либо провалом
     public boolean removeAdoption(Long adoptionId) {
         Optional<Adoption> adoption = adoptionRepository.findById(adoptionId);
         if (adoption.isPresent()) {

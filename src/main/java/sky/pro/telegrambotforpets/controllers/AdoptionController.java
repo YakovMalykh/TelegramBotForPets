@@ -120,28 +120,4 @@ public class AdoptionController {
         return ResponseEntity.ok(adoptions);
     }
 
-
-    @Operation(
-            summary = "удаляет запись об усыновлении из БД и обнуляет поле Усыновитель у питомца",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "успешно"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "записи об усныновлении с таким ID не найдено"
-                    )
-            }
-    )
-    @DeleteMapping("/{adoptionId}")
-    public ResponseEntity<Void> removeAdoption(@PathVariable Long adoptionId) {
-        boolean done = adoptionService.removeAdoption(adoptionId);
-        if (done) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
 }
