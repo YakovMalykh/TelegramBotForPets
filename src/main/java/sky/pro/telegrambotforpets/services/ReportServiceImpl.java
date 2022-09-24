@@ -38,7 +38,7 @@ public class ReportServiceImpl implements ReportService {
     @Value("${path.to.reports.folder}")
     private String photoPath;
     private final ReportRepository reportRepository;
- private final AdoptionService adoptionService;
+    private final AdoptionService adoptionService;
     private final SendInChatServiceImpl sendInChatService;
     //пока не сделана сущность усыновление
     private final Long adoptationId = 1L;
@@ -50,15 +50,17 @@ public class ReportServiceImpl implements ReportService {
         this.sendInChatService = sendInChatService;
         this.bot = bot;
     }
+
     public List<Report> findAll(Integer pageNumber, Integer pageSize) {
         logger.debug("metod findAll started");
         List<Report> reports = new ArrayList<Report>();
         if (pageNumber > 0) {
             PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
-            reports =reportRepository.findAll(pageRequest).getContent();
+            reports = reportRepository.findAll(pageRequest).getContent();
         }
         return reports;
     }
+
     public boolean updateReportToDB(Long adoptionId) {
         if (adoptationId != null) {
             LocalDate date = LocalDate.now();
@@ -81,7 +83,7 @@ public class ReportServiceImpl implements ReportService {
 
     public boolean saveReporFildToDB(ReportFild reportFild, Long adoptationId, String text) {
         LocalDate date = LocalDate.now();
-        Report report = reportRepository.findReportByDateAndAdoption_Id(date,adoptationId).orElse(new Report());
+        Report report = reportRepository.findReportByDateAndAdoption_Id(date, adoptationId).orElse(new Report());
         report.setAdoption(adoptionService.getAdoptionById(adoptationId).orElseThrow());
         report.setDate(date);
         switch (reportFild) {
@@ -121,7 +123,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     public String saveReportFotoFildToDB_(Long adoptationId, Document photos, Long chatId) throws IOException {
-        logger.info("ad"+adoptationId);
+        logger.info("ad" + adoptationId);
         String msg = "";
         LocalDate date = LocalDate.now();
         Path filePath = Path.of(photoPath, String.valueOf(adoptationId), date.toString());
@@ -148,19 +150,19 @@ public class ReportServiceImpl implements ReportService {
                     try (InputStream in = new URL(fullPath).openStream()) {
                         Files.copy(in, Path.of(String.valueOf(filePath), photosSize + "." + ext));
                         in.close();
-                        saveReporFildToDB(ReportFild.PHOTO,adoptationId, String.valueOf(Path.of(String.valueOf(filePath), photosSize + "." + ext)));
+                        saveReporFildToDB(ReportFild.PHOTO, adoptationId, String.valueOf(Path.of(String.valueOf(filePath), photosSize + "." + ext)));
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    msg = "Фото " + photosName + " сохранено под номером "+ photosSize;
+                    msg = "Фото " + photosName + " сохранено под номером " + photosSize;
                 }
             } else {
                 msg = "Пожалуйста, отправьте фото в формате .jpg,.jpeg или .png";
 
             }
         } else {
-            msg = "Вы сегодня уже отправили достаточно фото, нажмите кнопку " +MENU_EXIT.getButtonName();
+            msg = "Вы сегодня уже отправили достаточно фото, нажмите кнопку " + MENU_EXIT.getButtonName();
         }
         return msg;
     }

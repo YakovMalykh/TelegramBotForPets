@@ -15,7 +15,6 @@ import java.util.Objects;
 @Table(name = "guests")
 public class Guest {
     @Id
-
     private Long chatId;
     private String userName;
     private String phoneNumber;
