@@ -14,6 +14,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     /**
      * вернет список отчетов по усыновлениям на испытательном сроке
+     *
      * @return List
      */
     @Query(value = "select reports.* from adoption inner join reports on adoption.id = reports.adoption_id " +
@@ -23,10 +24,14 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     /**
      * ищем по усыновлению и по дате отчет
+     *
      * @param adoption
      * @param date
      * @return
      */
     Optional<Report> findByAdoptionAndDate(Adoption adoption, LocalDate date);
-      Optional<Report> findReportByDateAndAdoption_Id(LocalDate date, Long id);
+
+
+    List<Report> findReportByAdoptionId (Long id);
+    Optional<Report> findReportByDateAndAdoptionId(LocalDate date, Long id);
 }

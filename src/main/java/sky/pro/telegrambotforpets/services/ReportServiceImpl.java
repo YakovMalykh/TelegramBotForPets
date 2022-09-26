@@ -3,7 +3,6 @@ package sky.pro.telegrambotforpets.services;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Document;
 import com.pengrad.telegrambot.model.File;
-import com.pengrad.telegrambot.model.PhotoSize;
 import com.pengrad.telegrambot.request.GetFile;
 import com.pengrad.telegrambot.response.GetFileResponse;
 import org.slf4j.Logger;
@@ -62,29 +61,21 @@ public class ReportServiceImpl implements ReportService {
         return reports;
     }
 
-    public boolean updateReportToDB(Long adoptionId) {
-        if (adoptationId != null) {
-            LocalDate date = LocalDate.now();
-            Optional<Report> report = reportRepository.findReportByDateAndAdoption_Id(date, adoptionId);
-            if (!report.isPresent()) {
-                Report reportNew = new Report();
-                reportNew.setDate(date);
-                reportRepository.save(reportNew);
-                logger.info("Отчет занесен");
-                return false;
-            } else {
-                logger.info("Такой отчет уже есть");
-                return false;
-            }
-        } else {
-            logger.info("Такое усыновление не найдено в БД");
-            return false;
-        }
+    public List<Report> findByAdoptionId(Long adoptionId) {
+        logger.debug("metod findByAdoptionAid started");
+        return reportRepository.findReportByAdoptionId(adoptionId);
+
     }
 
-    public boolean saveReporFildToDB(ReportFild reportFild, Long adoptationId, String text) {
+    public Optional<Report> findByDateAndAdoptionId(LocalDate date, Long adoptionId) {
+        logger.debug("metod findByDateAndAdoptionId started");
+        return reportRepository.findReportByDateAndAdoptionId(date, adoptionId);
+
+    }
+
+    public String saveReporFildToDB(ReportFild reportFild, Long adoptationId, String text) {
         LocalDate date = LocalDate.now();
-        Report report = reportRepository.findReportByDateAndAdoption_Id(date, adoptationId).orElse(new Report());
+        Report report = reportRepository.findReportByDateAndAdoptionId(date, adoptationId).orElse(new Report());
         report.setAdoption(adoptionService.getAdoptionById(adoptationId).orElseThrow());
         report.setDate(date);
         switch (reportFild) {
@@ -94,36 +85,21 @@ public class ReportServiceImpl implements ReportService {
             case PHOTO -> report.setPhotoPath(text);
         }
         reportRepository.save(report);
-        logger.info("Поле отчета обновлено");
-        return true;
-    }
-
-
-    public boolean saveReportFotoFildToDB(Long adoptationId, List<PhotoSize> photos) throws IOException {
-
-        LocalDate date = LocalDate.now();
-        String f_id = photos.stream()
-                .findFirst()
-                .orElse(null).fileId();
-        GetFile request = new GetFile(f_id);
-        GetFileResponse getFileResponse = bot.execute(request);
-        File file = getFileResponse.file();
-        file.fileId();
-        file.filePath();
-        file.fileSize();
-        String fullPath = bot.getFullFilePath(file);
-        Path filePath = Path.of(photoPath, String.valueOf(adoptationId), date.toString(), file.filePath());
-        Files.createDirectories(filePath.getParent());
-        try (InputStream in = new URL(fullPath).openStream()) {
-            Files.copy(in, filePath);
-            in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        String msg="";
+        if (report.getRation()==null) {msg=" Рацион";}
+        if (report.getBehaivor()==null) {msg=msg + " Поведение";}
+        if (report.getFeeling()==null) {msg=msg + " Самочувствие";}
+        if (report.getPhotoPath()==null) {msg=msg + " Фото";}
+        if (msg.equals("")){
+            msg="Вы заполнили все поля отчета на сегодня, но если вы хотите поменять комментарий выберите соответсвующую кнопку";
+        } else {
+            msg = "Вы не заполнили следующую информацию: " +msg;
         }
-        return true;
+        logger.info("Поле отчета обновлено");
+        return msg;
     }
 
-    public String saveReportFotoFildToDB_(Long adoptationId, Document photos, Long chatId) throws IOException {
+       public String saveReportFotoFildToDB(Long adoptationId, Document photos, Long chatId) throws IOException {
         logger.info("ad" + adoptationId);
         String msg = "";
         LocalDate date = LocalDate.now();
