@@ -37,4 +37,6 @@ public class DogAdopter extends Adopter{
     public void setDog(Dog dog) {
         this.dog = dog;
     }
+
+
 }

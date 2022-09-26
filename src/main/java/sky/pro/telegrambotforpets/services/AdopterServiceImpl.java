@@ -76,7 +76,7 @@ public class AdopterServiceImpl implements AdopterService {
         }
 
         return false;
-    }//по номеру тел проверить есть ли chatId???
+    }
 
     /**
      * проверяет в БД гостей, есть ли гость с указанным номером телефона и если есть, то возвращает его chatId

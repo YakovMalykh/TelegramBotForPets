@@ -34,4 +34,5 @@ public class CatAdopter extends Adopter{
     public void setChatId(Long chatId) {
         this.chatId = chatId;
     }
+
 }
