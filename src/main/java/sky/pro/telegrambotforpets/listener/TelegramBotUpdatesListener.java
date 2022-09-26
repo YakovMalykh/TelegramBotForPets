@@ -91,7 +91,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                             if (update.message().document() != null) {
                                 String msg;
                                 try {
-                                    msg = reportService.saveReportFotoFildToDB_(adoptationId, update.message().document(), update.message().chat().id());
+                                    msg = reportService.saveReportFotoFildToDB(adoptationId, update.message().document(), update.message().chat().id());
                                 } catch (IOException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -104,14 +104,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                             }
                         }
                         case RASION, FEELING, BEHAIVOR -> {
+                            String msg;
                             if (update.message().text() != null) {
                                 logger.info("текст");
-                                reportService.saveReporFildToDB(reportFild, adoptationId, update.message().text());
-                                sendInChatService.sendMsg(update.message().chat().id(), "Поле " + reportFild + " отчета обновлено");
+                                msg=reportService.saveReporFildToDB(reportFild, adoptationId, update.message().text());
+                                sendInChatService.sendMsg(update.message().chat().id(), "Поле " + reportFild + " отчета обновлено." + msg);
                                 updateStatus.remove(update.message().chat().id());
                             } else {
                                 logger.info("не текст");
-                                sendInChatService.sendMsg(update.message().chat().id(), "отправьте фото или нажмите кнопку " + MENU_EXIT.getButtonName());
+                                sendInChatService.sendMsg(update.message().chat().id(), "отправьте текст или нажмите кнопку " + MENU_EXIT.getButtonName());
                             }
                         }
                     }
@@ -143,6 +144,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                                 MENU_1_2_BUTTON_1, MENU_1_2_BUTTON_2, MENU_1_2_BUTTON_3, MENU_1_2_BUTTON_4, MENU_1_2_BUTTON_5,
                                 MENU_1_2_BUTTON_6, MENU_1_2_BUTTON_7, MENU_1_2_BUTTON_8, MENU_1_2_BUTTON_9 -> {
                             sendInChatService.chouseMenu(button, chatId, shelterId);
+                            sendInChatService.sendMenu(chatId,inlineKeyboard.MenuContact());
                         }
                         case MENU_1_BUTTON_4 -> callVolunteerService.callVolunteer(chatId);
                         case MENU_1_BUTTON_3 -> {
@@ -180,9 +182,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
                         }
                         case MENU_0_BUTTON_1 -> {
                             choseShelter(chatId, Buttons.valueOf(update.callbackQuery().data()), KindOfAnimal.DOGS);
+                            sendInChatService.sendMenu(chatId,inlineKeyboard.MenuContact());
                         }
                         case MENU_0_BUTTON_2 -> {
                             choseShelter(chatId, Buttons.valueOf(update.callbackQuery().data()), KindOfAnimal.CATS);
+                            sendInChatService.sendMenu(chatId,inlineKeyboard.MenuContact());
                         }
 
                     }
