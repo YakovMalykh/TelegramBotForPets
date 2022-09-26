@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import sky.pro.telegrambotforpets.constants.Gender;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = AdopterController.class)
@@ -106,6 +108,44 @@ public class TelegramBotForPetsApplicationAdopterContrTest {
                         .param("address", address)
                         .param("kindOfAnimal", kindOfAnimalCat))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void successfullyGettingAdopterById() throws Exception {
+        when(catAdopterRepository.findById(anyLong())).thenReturn(Optional.of(catAdopter));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/adopter-controller/1")
+                        .param("kindOfAnimal", kindOfAnimalCat)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(testName));
+    }
+
+    @Test
+    public void failedGettingAdopterById() throws Exception {
+        when(catAdopterRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/adopter-controller/1")
+                        .param("kindOfAnimal", kindOfAnimalCat)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void successfullyEditAdopter() throws Exception {
+        when(catAdopterRepository.findById(anyLong())).thenReturn(Optional.of(catAdopter));
+        mockMvc.perform(MockMvcRequestBuilders
+                        .put("/adopter-controller/1")
+                        .param("kindOfAnimal", kindOfAnimalCat)
+                        .param("name", "NameForEditTest"))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    Assertions.assertThat(catAdopter.getName()).isEqualTo("NameForEditTest");
+                });
     }
 
 }
