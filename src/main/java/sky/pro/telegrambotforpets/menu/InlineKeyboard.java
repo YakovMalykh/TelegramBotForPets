@@ -22,17 +22,9 @@ public class InlineKeyboard extends Keyboard {
     public Keyboard Menu() {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton(Buttons.MENU_0_BUTTON_1.getButtonName()).callbackData(Buttons.MENU_0_BUTTON_1.name()), new InlineKeyboardButton(Buttons.MENU_0_BUTTON_2.getButtonName()).callbackData(Buttons.MENU_0_BUTTON_2.name()));
-
         return replyKeyboardMarkup;
     }
-
-    /*  public Keyboard MenuTest() {
-        Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
-                new InlineKeyboardButton("fgrthjty").switchInlineQueryCurrentChat("dfbfgb"));
-        return replyKeyboardMarkup;
-    }
-*/
-    public Keyboard MenuReport(Long shelterId) {
+  public Keyboard MenuReport(Long shelterId) {
         Keyboard replyKeyboardMarkup = new InlineKeyboardMarkup(
                 new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_1.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_3_BUTTON_1.name()),
                 new InlineKeyboardButton(Buttons.MENU_1_3_BUTTON_2.getButtonName()).callbackData(shelterId.toString() + "/" + Buttons.MENU_1_3_BUTTON_2.name()))
@@ -65,7 +57,7 @@ public class InlineKeyboard extends Keyboard {
 
     public Keyboard MenuContact() {
         Keyboard replyKeyboardMarkup = new ReplyKeyboardMarkup(
-                new KeyboardButton(Buttons.MENU_1_BUTTON_5.name()).requestContact(true))
+                new KeyboardButton(Buttons.MENU_1_BUTTON_5.getButtonName()).requestContact(true))
                 .oneTimeKeyboard(true)
                 .resizeKeyboard(true)
                 .selective(true);

@@ -1,8 +1,6 @@
 package sky.pro.telegrambotforpets.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import sky.pro.telegrambotforpets.constants.AdoptionsResult;
-import sky.pro.telegrambotforpets.constants.KindOfAnimal;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -38,6 +36,10 @@ public class Adoption {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getKindOfAnimal() {

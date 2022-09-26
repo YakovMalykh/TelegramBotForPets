@@ -1,8 +1,6 @@
 package sky.pro.telegrambotforpets.model;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.jetbrains.annotations.NotNull;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -28,7 +26,6 @@ public class Report {
     private String comment;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "adoption_id")
     private Adoption adoption;
 
